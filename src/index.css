@@ -12,3 +12,89 @@ body {
   min-height: 100vh;
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
+
+.skip-link {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1000;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  background: #0f172a;
+  color: #f8fafc;
+  border: 2px solid #38bdf8;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(14, 165, 233, 0.35);
+  transform: translateY(-200%);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  box-shadow: 0 0 0 4px rgba(125, 211, 252, 0.6);
+  outline: none;
+}
+
+main:focus-visible {
+  outline: 3px solid #38bdf8;
+  outline-offset: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skip-link {
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  [data-contrast='more'] .text-slate-500,
+  [data-contrast='more'] .text-slate-400,
+  [data-contrast='more'] .text-slate-300,
+  [data-contrast='more'] .text-slate-200 {
+    color: #f8fafc !important;
+  }
+
+  [data-contrast='more'] .text-slate-500 strong,
+  [data-contrast='more'] .text-slate-400 strong,
+  [data-contrast='more'] .text-slate-300 strong,
+  [data-contrast='more'] .text-slate-200 strong {
+    color: #f8fafc !important;
+  }
+
+  [data-contrast='more'] .bg-slate-900\/60,
+  [data-contrast='more'] .bg-slate-900\/70,
+  [data-contrast='more'] .bg-slate-900\/80,
+  [data-contrast='more'] .bg-slate-800\/60,
+  [data-contrast='more'] .bg-slate-800\/70,
+  [data-contrast='more'] .bg-slate-800\/80 {
+    background-color: rgba(2, 6, 23, 0.95) !important;
+  }
+
+  [data-contrast='more'] .border-slate-800\/60,
+  [data-contrast='more'] .border-slate-800\/70,
+  [data-contrast='more'] .border-slate-800\/80,
+  [data-contrast='more'] .border-slate-900\/60,
+  [data-contrast='more'] .border-slate-900\/70,
+  [data-contrast='more'] .border-slate-900\/80 {
+    border-color: rgba(148, 163, 184, 0.8) !important;
+  }
+
+  [data-contrast='more'] .hover\:bg-slate-800\/70:hover,
+  [data-contrast='more'] .hover\:bg-slate-900\/80:hover {
+    background-color: rgba(2, 6, 23, 0.98) !important;
+  }
+
+  [data-contrast='more'] .text-slate-500 a,
+  [data-contrast='more'] .text-slate-400 a,
+  [data-contrast='more'] .text-slate-300 a {
+    color: #bae6fd !important;
+  }
+
+  [data-contrast='more'] .skip-link {
+    background: #020617 !important;
+    color: #f8fafc !important;
+    border-color: #f8fafc !important;
+    box-shadow: 0 0 0 4px rgba(248, 250, 252, 0.65) !important;
+  }
+}

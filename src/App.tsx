@@ -73,10 +73,38 @@ export default function App() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [facts, setFacts] = useState<Factset | null>(null);
   const [highlights, setHighlights] = useState<Record<string, boolean>>({});
+  const [liveAnnouncement, setLiveAnnouncement] = useState('');
+  const [prefersHighContrast, setPrefersHighContrast] = useState(false);
 
   const reduceMotionPreference = useReducedMotion();
   const shouldReduceMotion = reduceMotionPreference ?? false;
   const highlightTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia('(prefers-contrast: more)');
+
+    const updatePreference = () => {
+      setPrefersHighContrast(mediaQuery.matches);
+    };
+
+    updatePreference();
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      setPrefersHighContrast(event.matches);
+    };
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+
+    mediaQuery.addListener(handleChange);
+    return () => mediaQuery.removeListener(handleChange);
+  }, []);
 
   const triggerHighlight = useCallback((ids: string[]) => {
     if (ids.length === 0) {
@@ -130,6 +158,19 @@ export default function App() {
 
         if (changedIds.length > 0) {
           triggerHighlight(changedIds);
+
+          const changedLabels = update.kpis
+            .filter((kpi) => changedIds.includes(kpi.id))
+            .map((kpi) => kpi.label);
+
+          if (changedLabels.length > 0) {
+            const timestamp = new Date(update.generatedAt).toLocaleTimeString([], {
+              hour: 'numeric',
+              minute: '2-digit',
+              second: '2-digit'
+            });
+            setLiveAnnouncement(`Data updated: ${changedLabels.join(', ')} • ${timestamp}`);
+          }
         }
 
         return update;
@@ -239,7 +280,13 @@ export default function App() {
   })();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="min-h-screen bg-slate-950 text-slate-100" data-contrast={prefersHighContrast ? 'more' : undefined}>
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
+      <VisuallyHidden aria-live="polite" role="status" aria-atomic="true">
+        {liveAnnouncement}
+      </VisuallyHidden>
       <header className="border-b border-slate-900/70 bg-slate-950/80 backdrop-blur">
         <Container className="flex flex-col gap-4 py-10">
           <div className="flex flex-col gap-2">
@@ -253,7 +300,7 @@ export default function App() {
           </div>
         </Container>
       </header>
-      <main className="py-12">
+      <main id="main-content" className="py-12" tabIndex={-1}>
         <Container className="space-y-10">
           <div className="flex flex-col gap-3">
             <VisuallyHidden id="section-tabs-label">Select dashboard section</VisuallyHidden>

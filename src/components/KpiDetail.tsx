@@ -1,4 +1,4 @@
-import { Suspense, lazy, type MouseEvent, useEffect } from 'react';
+import { Suspense, lazy, type MouseEvent, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 import { FocusScope } from './FocusScope';
@@ -20,6 +20,7 @@ type KpiDetailProps = {
 
 export function KpiDetail({ kpi, formattedValue, formattedDelta, generatedAt, trend, categories, onClose }: KpiDetailProps) {
   const { id, label } = kpi;
+  const headingRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     if (typeof document === 'undefined') {
@@ -46,7 +47,7 @@ export function KpiDetail({ kpi, formattedValue, formattedDelta, generatedAt, tr
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur"
       onClick={handleOverlayClick}
     >
-      <FocusScope onClose={onClose}>
+      <FocusScope onClose={onClose} initialFocusRef={headingRef}>
         <div
           role="dialog"
           aria-modal="true"
@@ -65,9 +66,14 @@ export function KpiDetail({ kpi, formattedValue, formattedDelta, generatedAt, tr
           </button>
           <div className="space-y-4">
             <div className="space-y-1">
-              <p id={`kpi-${id}-detail-label`} className="text-sm font-medium text-slate-400">
+              <h2
+                id={`kpi-${id}-detail-label`}
+                ref={headingRef}
+                tabIndex={-1}
+                className="text-sm font-semibold uppercase tracking-wide text-slate-300"
+              >
                 {label}
-              </p>
+              </h2>
               <p className="text-4xl font-semibold text-white">{formattedValue}</p>
               <p
                 className={cn(

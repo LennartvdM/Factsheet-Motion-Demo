@@ -1,8 +1,9 @@
-import { type ReactNode, useEffect, useRef } from 'react';
+import { type ReactNode, type RefObject, useEffect, useRef } from 'react';
 
 type FocusScopeProps = {
   children: ReactNode;
   onClose?: () => void;
+  initialFocusRef?: RefObject<HTMLElement | null>;
 };
 
 const FOCUSABLE_SELECTORS = [
@@ -23,7 +24,7 @@ const getFocusableElements = (container: HTMLElement) => {
   );
 };
 
-export function FocusScope({ children, onClose }: FocusScopeProps) {
+export function FocusScope({ children, onClose, initialFocusRef }: FocusScopeProps) {
   const scopeRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
 
@@ -43,6 +44,11 @@ export function FocusScope({ children, onClose }: FocusScopeProps) {
     }
 
     const focusInitialElement = () => {
+      if (initialFocusRef?.current) {
+        initialFocusRef.current.focus({ preventScroll: true });
+        return;
+      }
+
       const focusable = getFocusableElements(node);
 
       if (focusable.length > 0) {
@@ -101,7 +107,7 @@ export function FocusScope({ children, onClose }: FocusScopeProps) {
         previouslyFocusedElementRef.current.focus({ preventScroll: true });
       }
     };
-  }, [onClose]);
+  }, [initialFocusRef, onClose]);
 
   return (
     <div ref={scopeRef} tabIndex={-1}>
