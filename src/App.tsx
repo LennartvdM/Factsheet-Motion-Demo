@@ -1,58 +1,104 @@
-import { motion } from 'framer-motion';
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { useState } from 'react';
 
-const chartData = [
-  { month: 'Jan', value: 12 },
-  { month: 'Feb', value: 18 },
-  { month: 'Mar', value: 24 },
-  { month: 'Apr', value: 32 },
-  { month: 'May', value: 28 }
+import { Button } from './components/ui/Button';
+import { Card } from './components/ui/Card';
+import { Container } from './components/ui/Container';
+import { VisuallyHidden } from './components/ui/VisuallyHidden';
+import { cn } from './lib/cn';
+
+const timeframeOptions = [
+  { label: 'Today', value: 'today' },
+  { label: '7d', value: '7d' },
+  { label: '30d', value: '30d' },
+];
+
+const kpis = [
+  { label: 'Active Users', value: '1,248', change: '+12%' },
+  { label: 'New Signups', value: '342', change: '+8%' },
+  { label: 'Retention', value: '78%', change: '-3%' },
+  { label: 'Revenue', value: '$24.3K', change: '+5%' },
 ];
 
 export default function App() {
+  const [timeframe, setTimeframe] = useState<string>(timeframeOptions[0]?.value ?? 'today');
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-10 p-8">
-      <motion.section
-        className="max-w-xl space-y-4 rounded-3xl border border-slate-800 bg-slate-900/60 p-8 text-center shadow-lg shadow-cyan-500/10"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
-      >
-        <motion.h1
-          className="text-3xl font-bold tracking-tight sm:text-4xl"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          Factsheet Motion Demo
-        </motion.h1>
-        <motion.p
-          className="text-slate-300"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-        >
-          Animated insights with Tailwind CSS, Framer Motion, and Recharts.
-        </motion.p>
-        <motion.div
-          className="h-64 w-full overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/70"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 24, right: 24, bottom: 16, left: 16 }}>
-              <XAxis dataKey="month" stroke="#94a3b8" tickLine={false} axisLine={{ stroke: '#334155' }} />
-              <YAxis stroke="#94a3b8" tickLine={false} axisLine={{ stroke: '#334155' }} />
-              <Tooltip
-                contentStyle={{ backgroundColor: '#0f172a', borderRadius: '0.75rem', borderColor: '#1e293b' }}
-                labelStyle={{ color: '#38bdf8' }}
-              />
-              <Line type="monotone" dataKey="value" stroke="#38bdf8" strokeWidth={3} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
-        </motion.div>
-      </motion.section>
-    </main>
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      <header className="border-b border-slate-900/70 bg-slate-950/80 backdrop-blur">
+        <Container className="flex flex-col gap-4 py-10">
+          <div className="flex flex-col gap-2">
+            <p className="text-sm font-medium uppercase tracking-wide text-sky-400">Dashboard</p>
+            <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+              Live Factsheet
+            </h1>
+            <p className="max-w-2xl text-sm text-slate-400">
+              Monitor key metrics and trends at a glance. Adjust the timeframe to explore recent performance before sharing updates with your team.
+            </p>
+          </div>
+        </Container>
+      </header>
+      <main className="py-12">
+        <Container className="space-y-10">
+          <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-white">Overview</h2>
+              <p className="text-sm text-slate-400">Track activity across the selected timeframe.</p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+              <div
+                role="group"
+                aria-labelledby="timeframe-label"
+                className="inline-flex items-center gap-1 rounded-2xl border border-slate-800/80 bg-slate-900/60 p-1 shadow-inner shadow-slate-900/40"
+              >
+                <VisuallyHidden id="timeframe-label">Select timeframe</VisuallyHidden>
+                {timeframeOptions.map((option) => {
+                  const isActive = option.value === timeframe;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      aria-pressed={isActive}
+                      onClick={() => setTimeframe(option.value)}
+                      className={cn(
+                        'relative rounded-xl px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
+                        isActive
+                          ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/20'
+                          : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
+                      )}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <Button variant="ghost" className="sm:w-auto">
+                Export
+              </Button>
+            </div>
+          </section>
+          <section>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {kpis.map((kpi) => {
+                const isNegative = kpi.change.startsWith('-');
+                return (
+                  <Card key={kpi.label} className="space-y-4">
+                    <div className="text-sm font-medium text-slate-400">{kpi.label}</div>
+                    <div className="text-3xl font-semibold text-white">{kpi.value}</div>
+                    <div
+                      className={cn(
+                        'text-sm font-semibold',
+                        isNegative ? 'text-rose-400' : 'text-emerald-400'
+                      )}
+                    >
+                      {kpi.change} vs last period
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          </section>
+        </Container>
+      </main>
+    </div>
   );
 }
