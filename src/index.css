@@ -19,6 +19,12 @@ body {
     sans-serif;
 }
 
+[data-exporting='true'],
+[data-exporting='true'] * {
+  transition: none !important;
+  animation: none !important;
+}
+
 .skip-link {
   position: fixed;
   top: 1rem;

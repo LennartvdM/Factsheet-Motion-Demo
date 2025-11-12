@@ -13,3 +13,14 @@ declare module '../../server/mock-data' {
 declare module '../../server/mock-data.js' {
   export * from '../../server/mock-data';
 }
+
+declare global {
+  interface Window {
+    html2canvas?: (
+      element: HTMLElement,
+      options?: { backgroundColor?: string; scale?: number }
+    ) => Promise<HTMLCanvasElement>;
+  }
+}
+
+export {};

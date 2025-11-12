@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { KpiCard } from '../components/KpiCard';
@@ -48,8 +48,94 @@ export function Overview({
   shouldReduceMotion,
   facts,
 }: OverviewProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const gridRef = useRef<HTMLDivElement | null>(null);
+
+  const timeframeLabel = timeframeOptions.find((option) => option.value === timeframe)?.label ?? timeframe;
+  const canExport = Boolean(displayKpis && displayKpis.length > 0 && facts);
+
+  useEffect(() => {
+    if (!canExport) {
+      setIsMenuOpen(false);
+    }
+  }, [canExport]);
+
+  useEffect(() => {
+    if (!isMenuOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node;
+      if (menuRef.current?.contains(target) || buttonRef.current?.contains(target)) {
+        return;
+      }
+      setIsMenuOpen(false);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setIsMenuOpen(false);
+        buttonRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isMenuOpen]);
+
+  useEffect(() => {
+    if (!isMenuOpen) {
+      return;
+    }
+
+    const firstItem = menuRef.current?.querySelector<HTMLButtonElement>('button');
+    firstItem?.focus();
+  }, [isMenuOpen]);
+
+  const handleExportCsv = () => {
+    if (!displayKpis || !facts) {
+      return;
+    }
+
+    exportSnapshotCsv({
+      kpis: displayKpis.map((kpi) => kpi.raw),
+      trend: facts.trend.slice(-30),
+      generatedAt: facts.generatedAt,
+      timeframe: timeframeLabel,
+    });
+    setIsMenuOpen(false);
+  };
+
+  const handleExportPng = () => {
+    if (!displayKpis || !facts) {
+      return;
+    }
+
+    const element = gridRef.current;
+
+    if (!element) {
+      return;
+    }
+
+    void exportKpiGridPng({
+      element,
+      reduceMotion: shouldReduceMotion,
+      timeframe: timeframeLabel,
+    });
+    setIsMenuOpen(false);
+  };
+
   const grid = displayKpis ? (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div ref={gridRef} className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {displayKpis.map((kpi) => (
         <KpiCard
           key={kpi.id}
@@ -191,9 +277,45 @@ export function Overview({
               ariaLabelledBy="overview-timeframe-label"
             />
           </div>
-          <Button variant="ghost" className="sm:w-auto">
-            Export
-          </Button>
+          <div className="relative">
+            <Button
+              ref={buttonRef}
+              variant="ghost"
+              className="sm:w-auto"
+              aria-haspopup="menu"
+              aria-expanded={isMenuOpen}
+              aria-controls="overview-export-menu"
+              onClick={() => setIsMenuOpen((open) => !open)}
+              disabled={!canExport}
+            >
+              Export snapshot
+            </Button>
+            {isMenuOpen ? (
+              <div
+                ref={menuRef}
+                id="overview-export-menu"
+                role="menu"
+                className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-xl border border-slate-800/70 bg-slate-900/90 p-1 shadow-xl shadow-slate-950/40 backdrop-blur"
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-slate-200 transition hover:bg-slate-800/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                  onClick={handleExportCsv}
+                >
+                  Export CSV
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-slate-200 transition hover:bg-slate-800/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                  onClick={handleExportPng}
+                >
+                  Export PNG
+                </button>
+              </div>
+            ) : null}
+          </div>
         </div>
       </section>
       {shouldReduceMotion ? (
