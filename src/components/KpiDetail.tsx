@@ -1,8 +1,12 @@
-import { type MouseEvent, useEffect } from 'react';
+import { Suspense, lazy, type MouseEvent, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
 import { FocusScope } from './FocusScope';
 import { cn } from '../lib/cn';
+import { categoryBreakdown, trendData } from '../lib/chartData';
+
+const TrendLine = lazy(() => import('./charts/TrendLine'));
+const BarBreakdown = lazy(() => import('./charts/BarBreakdown'));
 
 type KpiDetailProps = {
   id: string;
@@ -74,6 +78,25 @@ export function KpiDetail({ id, label, value, delta, onClose }: KpiDetailProps) 
               Compare performance over time, track the inflection points, and determine how this metric influences the rest of
               the dashboard. View transitions provide a sense of continuity between summary cards and detailed breakdowns.
             </p>
+            <div className="space-y-4">
+              <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Charts</h3>
+              <Suspense
+                fallback={
+                  <div className="flex h-[30rem] items-center justify-center rounded-2xl border border-slate-800/60 bg-slate-900/40 text-sm text-slate-400">
+                    Loading detailed charts…
+                  </div>
+                }
+              >
+                <div className="grid gap-4">
+                  <div className="h-60 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-3">
+                    <TrendLine data={trendData} />
+                  </div>
+                  <div className="h-60 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-3">
+                    <BarBreakdown data={categoryBreakdown} />
+                  </div>
+                </div>
+              </Suspense>
+            </div>
           </div>
         </div>
       </FocusScope>

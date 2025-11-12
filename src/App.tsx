@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { Suspense, lazy, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 
 import { KpiCard } from './components/KpiCard';
 import { KpiDetail } from './components/KpiDetail';
@@ -7,6 +8,10 @@ import { Container } from './components/ui/Container';
 import { VisuallyHidden } from './components/ui/VisuallyHidden';
 import { cn } from './lib/cn';
 import { withViewTransition } from './lib/viewTransition';
+import { categoryBreakdown, trendData } from './lib/chartData';
+
+const TrendLine = lazy(() => import('./components/charts/TrendLine'));
+const BarBreakdown = lazy(() => import('./components/charts/BarBreakdown'));
 
 const timeframeOptions = [
   { label: 'Today', value: 'today' },
@@ -24,6 +29,7 @@ const kpis = [
 export default function App() {
   const [timeframe, setTimeframe] = useState<string>(timeframeOptions[0]?.value ?? 'today');
   const [openId, setOpenId] = useState<string | null>(null);
+  const shouldReduceMotion = useReducedMotion();
 
   const handleTimeframeChange = (value: string) => {
     withViewTransition(() => {
@@ -106,6 +112,36 @@ export default function App() {
               ))}
             </div>
           </section>
+          <motion.section
+            className="overflow-hidden rounded-3xl border border-slate-800/80 bg-slate-900/60 p-6 shadow-2xl shadow-slate-950/40"
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
+            animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+            transition={shouldReduceMotion ? undefined : { duration: 0.5, ease: 'easeOut' }}
+          >
+            <div className="flex flex-col gap-2 pb-4">
+              <p className="text-sm font-medium uppercase tracking-[0.2em] text-sky-400">Trends</p>
+              <h2 className="text-2xl font-semibold text-white">Performance over time</h2>
+              <p className="text-sm text-slate-400">
+                Explore how engagement evolves across the network and where regional momentum is accelerating.
+              </p>
+            </div>
+            <Suspense
+              fallback={
+                <div className="flex h-[32rem] items-center justify-center rounded-2xl border border-slate-800/60 bg-slate-900/40 text-sm text-slate-400">
+                  Loading trend insights…
+                </div>
+              }
+            >
+              <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
+                <div className="h-72 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-4">
+                  <TrendLine data={trendData} />
+                </div>
+                <div className="h-72 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-4">
+                  <BarBreakdown data={categoryBreakdown} />
+                </div>
+              </div>
+            </Suspense>
+          </motion.section>
         </Container>
       </main>
       {activeKpi ? <KpiDetail {...activeKpi} onClose={handleCloseDetail} /> : null}
