@@ -152,11 +152,14 @@ export function Overview({
   ) : (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {Array.from({ length: 4 }).map((_, index) => (
-        <div key={index} className="flex h-full flex-col gap-3 rounded-2xl border border-slate-800/70 bg-slate-900/40 p-6">
-          <div className={cn('h-4 w-24 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
-          <div className={cn('h-8 w-32 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
-          <div className={cn('h-4 w-20 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
-          <div className={cn('mt-auto h-3 w-16 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
+        <div
+          key={index}
+          className="flex h-full flex-col gap-3 rounded-2xl border border-soft bg-[rgba(var(--color-card),0.6)] p-6 transition-colors"
+        >
+          <div className={cn('h-4 w-24 rounded-full bg-[rgba(var(--color-border),0.35)]', !shouldReduceMotion && 'animate-pulse')} />
+          <div className={cn('h-8 w-32 rounded-full bg-[rgba(var(--color-border),0.35)]', !shouldReduceMotion && 'animate-pulse')} />
+          <div className={cn('h-4 w-20 rounded-full bg-[rgba(var(--color-border),0.35)]', !shouldReduceMotion && 'animate-pulse')} />
+          <div className={cn('mt-auto h-3 w-16 rounded-full bg-[rgba(var(--color-border),0.35)]', !shouldReduceMotion && 'animate-pulse')} />
         </div>
       ))}
     </div>
@@ -164,38 +167,38 @@ export function Overview({
 
   const trendContent = (
     <motion.section
-      className="overflow-hidden rounded-3xl border border-slate-800/80 bg-slate-900/60 p-6 shadow-2xl shadow-slate-950/40"
+      className="overflow-hidden rounded-3xl border border-strong bg-[rgba(var(--color-card),0.8)] p-6 shadow-2xl shadow-[rgba(var(--color-overlay),0.3)] transition-colors"
       initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
       animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
       transition={shouldReduceMotion ? undefined : { duration: 0.5, ease: 'easeOut' }}
     >
       <div className="flex flex-col gap-2 pb-4">
-        <p className="text-sm font-medium uppercase tracking-[0.2em] text-sky-400">Trends</p>
-        <h2 className="text-2xl font-semibold text-white">Performance over time</h2>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm font-medium uppercase tracking-[0.2em] text-accent">Trends</p>
+        <h2 className="text-2xl font-semibold">Performance over time</h2>
+        <p className="text-sm text-subtle">
           Explore how engagement evolves across the network and where regional momentum is accelerating.
         </p>
       </div>
       <Suspense
         fallback={
-          <div className="flex h-[32rem] items-center justify-center rounded-2xl border border-slate-800/60 bg-slate-900/40 text-sm text-slate-400">
+          <div className="flex h-[32rem] items-center justify-center rounded-2xl border border-soft bg-[rgba(var(--color-card),0.6)] text-sm text-subtle">
             Loading trend insights…
           </div>
         }
       >
         <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
-          <div className="h-72 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-4">
+          <div className="h-72 overflow-hidden rounded-2xl border border-strong bg-[rgba(var(--color-card),0.75)] p-4">
             {facts ? (
               <TrendLine data={facts.trend} />
             ) : (
-              <div className={cn('h-full rounded-xl bg-slate-900/40', !shouldReduceMotion && 'animate-pulse')} />
+              <div className={cn('h-full rounded-xl bg-[rgba(var(--color-surface-muted),0.6)]', !shouldReduceMotion && 'animate-pulse')} />
             )}
           </div>
-          <div className="h-72 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-4">
+          <div className="h-72 overflow-hidden rounded-2xl border border-strong bg-[rgba(var(--color-card),0.75)] p-4">
             {facts ? (
               <BarBreakdown data={facts.categories} />
             ) : (
-              <div className={cn('h-full rounded-xl bg-slate-900/40', !shouldReduceMotion && 'animate-pulse')} />
+              <div className={cn('h-full rounded-xl bg-[rgba(var(--color-surface-muted),0.6)]', !shouldReduceMotion && 'animate-pulse')} />
             )}
           </div>
         </div>
@@ -223,10 +226,10 @@ export function Overview({
     <div className="space-y-10">
       <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
-          <h2 className="text-lg font-semibold text-white">Overview</h2>
-          <p className="text-sm text-slate-400">Track activity across the selected timeframe.</p>
+          <h2 className="text-lg font-semibold">Overview</h2>
+          <p className="text-sm text-subtle">Track activity across the selected timeframe.</p>
           {lastUpdatedLabel ? (
-            <p className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">Last updated {lastUpdatedLabel}</p>
+            <p className="text-xs font-medium uppercase tracking-[0.3em] text-subtle">Last updated {lastUpdatedLabel}</p>
           ) : null}
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
@@ -257,12 +260,12 @@ export function Overview({
                 ref={menuRef}
                 id="overview-export-menu"
                 role="menu"
-                className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-xl border border-slate-800/70 bg-slate-900/90 p-1 shadow-xl shadow-slate-950/40 backdrop-blur"
+                className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-xl border border-soft bg-[rgba(var(--color-card),0.95)] p-1 shadow-xl shadow-[rgba(var(--color-overlay),0.25)] backdrop-blur transition"
               >
                 <button
                   type="button"
                   role="menuitem"
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-slate-200 transition hover:bg-slate-800/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[rgb(var(--color-text))] transition hover:bg-[rgba(var(--color-card),0.9)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-card))]"
                   onClick={handleExportCsv}
                 >
                   Export CSV
@@ -270,7 +273,7 @@ export function Overview({
                 <button
                   type="button"
                   role="menuitem"
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-slate-200 transition hover:bg-slate-800/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[rgb(var(--color-text))] transition hover:bg-[rgba(var(--color-card),0.9)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-card))]"
                   onClick={handleExportPng}
                 >
                   Export PNG
