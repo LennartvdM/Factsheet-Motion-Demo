@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 
 import { KpiDetail } from './components/KpiDetail';
@@ -8,10 +8,12 @@ import { VisuallyHidden } from './components/ui/VisuallyHidden';
 import { withViewTransition } from './lib/viewTransition';
 import { getInitialFacts, subscribeFacts } from './data/client';
 import type { Factset, KPI } from './types';
+import { useTransientWillChange } from './hooks/useTransientWillChange';
 
-import { Breakdown } from './sections/Breakdown';
-import { Notes } from './sections/Notes';
-import { Overview } from './sections/Overview';
+const Overview = lazy(() => import('./sections/Overview'));
+const Breakdown = lazy(() => import('./sections/Breakdown'));
+const Notes = lazy(() => import('./sections/Notes'));
+const DevFpsMeter = lazy(() => import('./components/dev/FpsMeter'));
 
 const timeframeOptions = [
   { label: 'Today', value: 'today' },
@@ -73,6 +75,7 @@ export default function App() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [facts, setFacts] = useState<Factset | null>(null);
   const [highlights, setHighlights] = useState<Record<string, boolean>>({});
+  const [showDevTools, setShowDevTools] = useState(false);
 
   const reduceMotionPreference = useReducedMotion();
   const shouldReduceMotion = reduceMotionPreference ?? false;
@@ -154,6 +157,45 @@ export default function App() {
       highlightTimers.current = {};
     };
   }, [triggerHighlight]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const win = window as typeof window & {
+      requestIdleCallback?: (callback: IdleRequestCallback) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+
+    const prewarmCharts = () => {
+      void import('./components/charts/TrendLine');
+      void import('./components/charts/BarBreakdown');
+    };
+
+    if (typeof win.requestIdleCallback === 'function') {
+      const handle = win.requestIdleCallback(() => {
+        prewarmCharts();
+      });
+      return () => {
+        win.cancelIdleCallback?.(handle);
+      };
+    }
+
+    const timeout = window.setTimeout(prewarmCharts, 300);
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    setShowDevTools(params.get('dev') === '1');
+  }, []);
 
   const displayKpis = useMemo<DisplayKpi[] | undefined>(() => {
     if (!facts) {
@@ -238,6 +280,8 @@ export default function App() {
     }
   })();
 
+  const tabWillChange = useTransientWillChange([activeTab]);
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <header className="border-b border-slate-900/70 bg-slate-950/80 backdrop-blur">
@@ -265,26 +309,35 @@ export default function App() {
               ariaLabelledBy="section-tabs-label"
             />
           </div>
-          {shouldReduceMotion ? (
-            <div id={`tab-panel-${activeTab}`} role="tabpanel" aria-labelledby={`tab-${activeTab}`}>
-              {tabPanel}
-            </div>
-          ) : (
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={activeTab}
-                id={`tab-panel-${activeTab}`}
-                role="tabpanel"
-                aria-labelledby={`tab-${activeTab}`}
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -24 }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
-              >
+          <Suspense
+            fallback={
+              <div className="rounded-3xl border border-slate-800/80 bg-slate-900/60 p-10 text-center text-sm text-slate-400">
+                Loading insights…
+              </div>
+            }
+          >
+            {shouldReduceMotion ? (
+              <div id={`tab-panel-${activeTab}`} role="tabpanel" aria-labelledby={`tab-${activeTab}`}>
                 {tabPanel}
-              </motion.div>
-            </AnimatePresence>
-          )}
+              </div>
+            ) : (
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={activeTab}
+                  id={`tab-panel-${activeTab}`}
+                  role="tabpanel"
+                  aria-labelledby={`tab-${activeTab}`}
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -24 }}
+                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                  style={tabWillChange}
+                >
+                  {tabPanel}
+                </motion.div>
+              </AnimatePresence>
+            )}
+          </Suspense>
         </Container>
       </main>
       {activeKpi && facts ? (
@@ -297,6 +350,11 @@ export default function App() {
           categories={facts.categories}
           onClose={handleCloseDetail}
         />
+      ) : null}
+      {showDevTools ? (
+        <Suspense fallback={null}>
+          <DevFpsMeter />
+        </Suspense>
       ) : null}
     </div>
   );

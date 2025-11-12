@@ -1,9 +1,11 @@
+import { memo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { Segmented } from '../components/ui/Segmented';
 import { VisuallyHidden } from '../components/ui/VisuallyHidden';
 import { cn } from '../lib/cn';
 import type { Factset } from '../types';
+import { useTransientWillChange } from '../hooks/useTransientWillChange';
 
 type Option = {
   label: string;
@@ -18,16 +20,18 @@ type BreakdownProps = {
   facts: Factset | null;
 };
 
-export function Breakdown({
+const BreakdownComponent = ({
   timeframe,
   timeframeOptions,
   onTimeframeChange,
   shouldReduceMotion,
   facts
-}: BreakdownProps) {
+}: BreakdownProps) => {
   const categories = facts?.categories ?? [];
   const total = categories.reduce((sum, item) => sum + item.value, 0);
   const maxValue = Math.max(...categories.map((item) => item.value), 0);
+  const factsKey = facts ? facts.generatedAt : 'loading';
+  const fadeWillChange = useTransientWillChange([timeframe, factsKey]);
 
   const fadeContent = (
     <AnimatePresence mode="wait" initial={false}>
@@ -38,6 +42,7 @@ export function Breakdown({
         exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.92 }}
         transition={shouldReduceMotion ? undefined : { duration: 0.24, ease: 'easeOut' }}
         className="space-y-6"
+        style={fadeWillChange}
       >
         {categories.length > 0 ? (
           categories.map((category) => {
@@ -138,4 +143,8 @@ export function Breakdown({
       )}
     </div>
   );
-}
+};
+
+export const Breakdown = memo(BreakdownComponent);
+
+export default Breakdown;

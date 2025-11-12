@@ -1,9 +1,11 @@
+import { memo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { Segmented } from '../components/ui/Segmented';
 import { VisuallyHidden } from '../components/ui/VisuallyHidden';
 import { cn } from '../lib/cn';
 import type { Factset } from '../types';
+import { useTransientWillChange } from '../hooks/useTransientWillChange';
 
 type Option = {
   label: string;
@@ -24,8 +26,10 @@ const timeframeDescriptions: Record<string, string> = {
   '30d': 'Monthly perspective supports planning conversations with leadership.'
 };
 
-export function Notes({ timeframe, timeframeOptions, onTimeframeChange, shouldReduceMotion, facts }: NotesProps) {
+const NotesComponent = ({ timeframe, timeframeOptions, onTimeframeChange, shouldReduceMotion, facts }: NotesProps) => {
   const topKpis = facts?.kpis.slice(0, 3) ?? [];
+  const factsKey = facts ? facts.generatedAt : 'loading';
+  const fadeWillChange = useTransientWillChange([timeframe, factsKey]);
 
   const fadeContent = (
     <AnimatePresence mode="wait" initial={false}>
@@ -36,6 +40,7 @@ export function Notes({ timeframe, timeframeOptions, onTimeframeChange, shouldRe
         exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.92 }}
         transition={shouldReduceMotion ? undefined : { duration: 0.24, ease: 'easeOut' }}
         className="space-y-6"
+        style={fadeWillChange}
       >
         <p className="text-sm text-slate-300">{timeframeDescriptions[timeframe] ?? timeframeDescriptions.today}</p>
         <ul className="space-y-3">
@@ -106,4 +111,8 @@ export function Notes({ timeframe, timeframeOptions, onTimeframeChange, shouldRe
       )}
     </div>
   );
-}
+};
+
+export const Notes = memo(NotesComponent);
+
+export default Notes;

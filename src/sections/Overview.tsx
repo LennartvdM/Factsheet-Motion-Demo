@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, memo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { KpiCard } from '../components/KpiCard';
@@ -7,6 +7,7 @@ import { Segmented } from '../components/ui/Segmented';
 import { VisuallyHidden } from '../components/ui/VisuallyHidden';
 import { cn } from '../lib/cn';
 import type { Factset } from '../types';
+import { useTransientWillChange } from '../hooks/useTransientWillChange';
 
 const TrendLine = lazy(() => import('../components/charts/TrendLine'));
 const BarBreakdown = lazy(() => import('../components/charts/BarBreakdown'));
@@ -35,7 +36,7 @@ type OverviewProps = {
   facts: Factset | null;
 };
 
-export function Overview({
+const OverviewComponent = ({
   timeframe,
   timeframeOptions,
   onTimeframeChange,
@@ -45,7 +46,7 @@ export function Overview({
   onOpenDetail,
   shouldReduceMotion,
   facts
-}: OverviewProps) {
+}: OverviewProps) => {
   const grid = displayKpis ? (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {displayKpis.map((kpi) => (
@@ -74,12 +75,17 @@ export function Overview({
     </div>
   );
 
+  const factsKey = facts ? facts.generatedAt : 'loading';
+  const sectionWillChange = useTransientWillChange([factsKey]);
+  const fadeWillChange = useTransientWillChange([timeframe, factsKey]);
+
   const trendContent = (
     <motion.section
       className="overflow-hidden rounded-3xl border border-slate-800/80 bg-slate-900/60 p-6 shadow-2xl shadow-slate-950/40"
       initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
       animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
       transition={shouldReduceMotion ? undefined : { duration: 0.5, ease: 'easeOut' }}
+      style={sectionWillChange}
     >
       <div className="flex flex-col gap-2 pb-4">
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-sky-400">Trends</p>
@@ -124,6 +130,7 @@ export function Overview({
         exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.92 }}
         transition={shouldReduceMotion ? undefined : { duration: 0.24, ease: 'easeOut' }}
         className="space-y-10"
+        style={fadeWillChange}
       >
         {grid}
         {trendContent}
@@ -159,4 +166,8 @@ export function Overview({
       {shouldReduceMotion ? <div className="space-y-10">{grid}{trendContent}</div> : fadeContent}
     </div>
   );
-}
+};
+
+export const Overview = memo(OverviewComponent);
+
+export default Overview;

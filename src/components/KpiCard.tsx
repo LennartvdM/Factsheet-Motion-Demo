@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 import { cn } from '../lib/cn';
 
 type KpiCardProps = {
@@ -10,7 +12,7 @@ type KpiCardProps = {
   reduceMotion?: boolean;
 };
 
-export function KpiCard({ id, label, value, delta, onOpen, highlighted = false, reduceMotion = false }: KpiCardProps) {
+const KpiCardComponent = ({ id, label, value, delta, onOpen, highlighted = false, reduceMotion = false }: KpiCardProps) => {
   const isNegative = delta.trim().startsWith('-');
   const labelId = `kpi-${id}-label`;
   const valueId = `kpi-${id}-value`;
@@ -46,6 +48,8 @@ export function KpiCard({ id, label, value, delta, onOpen, highlighted = false, 
       </span>
     </button>
   );
-}
+};
+
+export const KpiCard = memo(KpiCardComponent);
 
 export default KpiCard;

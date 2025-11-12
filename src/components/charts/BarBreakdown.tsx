@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { memo, useId } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import {
   Bar,
@@ -17,7 +17,7 @@ type BarBreakdownProps = {
   fillColor?: string;
 };
 
-export default function BarBreakdown({ data, fillColor = '#22d3ee' }: BarBreakdownProps) {
+const BarBreakdownComponent = ({ data, fillColor = '#22d3ee' }: BarBreakdownProps) => {
   const gradientId = useId();
   const shouldReduceMotion = useReducedMotion();
 
@@ -53,4 +53,8 @@ export default function BarBreakdown({ data, fillColor = '#22d3ee' }: BarBreakdo
       </BarChart>
     </ResponsiveContainer>
   );
-}
+};
+
+const BarBreakdown = memo(BarBreakdownComponent);
+
+export default BarBreakdown;

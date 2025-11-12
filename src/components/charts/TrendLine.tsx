@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { memo, useId } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import {
   Area,
@@ -18,7 +18,7 @@ type TrendLineProps = {
   accentColor?: string;
 };
 
-export default function TrendLine({ data, accentColor = '#38bdf8' }: TrendLineProps) {
+const TrendLineComponent = ({ data, accentColor = '#38bdf8' }: TrendLineProps) => {
   const gradientId = useId();
   const shouldReduceMotion = useReducedMotion();
 
@@ -75,4 +75,8 @@ export default function TrendLine({ data, accentColor = '#38bdf8' }: TrendLinePr
       </LineChart>
     </ResponsiveContainer>
   );
-}
+};
+
+const TrendLine = memo(TrendLineComponent);
+
+export default TrendLine;

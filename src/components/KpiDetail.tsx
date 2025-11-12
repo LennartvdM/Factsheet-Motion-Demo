@@ -1,4 +1,4 @@
-import { Suspense, lazy, type MouseEvent, useEffect } from 'react';
+import { Suspense, lazy, memo, type MouseEvent, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
 import { FocusScope } from './FocusScope';
@@ -18,7 +18,15 @@ type KpiDetailProps = {
   onClose: () => void;
 };
 
-export function KpiDetail({ kpi, formattedValue, formattedDelta, generatedAt, trend, categories, onClose }: KpiDetailProps) {
+const KpiDetailComponent = ({
+  kpi,
+  formattedValue,
+  formattedDelta,
+  generatedAt,
+  trend,
+  categories,
+  onClose
+}: KpiDetailProps) => {
   const { id, label } = kpi;
 
   useEffect(() => {
@@ -111,6 +119,8 @@ export function KpiDetail({ kpi, formattedValue, formattedDelta, generatedAt, tr
   );
 
   return typeof document === 'undefined' ? content : createPortal(content, document.body);
-}
+};
+
+export const KpiDetail = memo(KpiDetailComponent);
 
 export default KpiDetail;
