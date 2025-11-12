@@ -16,13 +16,13 @@ import { Overview } from './sections/Overview';
 const timeframeOptions = [
   { label: 'Today', value: 'today' },
   { label: '7d', value: '7d' },
-  { label: '30d', value: '30d' }
+  { label: '30d', value: '30d' },
 ];
 
 const tabOptions = [
   { label: 'Overview', value: 'overview', id: 'tab-overview', controls: 'tab-panel-overview' },
   { label: 'Breakdown', value: 'breakdown', id: 'tab-breakdown', controls: 'tab-panel-breakdown' },
-  { label: 'Notes', value: 'notes', id: 'tab-notes', controls: 'tab-panel-notes' }
+  { label: 'Notes', value: 'notes', id: 'tab-notes', controls: 'tab-panel-notes' },
 ];
 
 const integerFormatter = new Intl.NumberFormat('en-US');
@@ -30,18 +30,18 @@ const compactCurrencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
   maximumFractionDigits: 1,
-  notation: 'compact'
+  notation: 'compact',
 });
 const percentValueFormatter = new Intl.NumberFormat('en-US', {
   style: 'percent',
   minimumFractionDigits: 0,
-  maximumFractionDigits: 0
+  maximumFractionDigits: 0,
 });
 const percentDeltaFormatter = new Intl.NumberFormat('en-US', {
   style: 'percent',
   signDisplay: 'always',
   minimumFractionDigits: 0,
-  maximumFractionDigits: 1
+  maximumFractionDigits: 1,
 });
 
 function formatKpiValue(kpi: KPI): string {
@@ -65,6 +65,7 @@ type DisplayKpi = {
   value: string;
   delta: string;
   raw: KPI;
+  valueFormatter: (value: number) => string;
 };
 
 export default function App() {
@@ -167,7 +168,7 @@ export default function App() {
             const timestamp = new Date(update.generatedAt).toLocaleTimeString([], {
               hour: 'numeric',
               minute: '2-digit',
-              second: '2-digit'
+              second: '2-digit',
             });
             setLiveAnnouncement(`Data updated: ${changedLabels.join(', ')} • ${timestamp}`);
           }
@@ -206,7 +207,8 @@ export default function App() {
       label: kpi.label,
       value: formatKpiValue(kpi),
       delta: formatDelta(kpi.delta),
-      raw: kpi
+      raw: kpi,
+      valueFormatter: (latest: number) => formatKpiValue({ ...kpi, value: latest }),
     }));
   }, [facts]);
 
@@ -236,7 +238,11 @@ export default function App() {
 
   const activeKpi = openId ? displayKpis?.find((kpi) => kpi.id === openId) : undefined;
   const lastUpdatedLabel = facts
-    ? new Date(facts.generatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' })
+    ? new Date(facts.generatedAt).toLocaleTimeString([], {
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+      })
     : null;
 
   const tabPanel = (() => {
@@ -280,7 +286,10 @@ export default function App() {
   })();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100" data-contrast={prefersHighContrast ? 'more' : undefined}>
+    <div
+      className="min-h-screen bg-slate-950 text-slate-100"
+      data-contrast={prefersHighContrast ? 'more' : undefined}
+    >
       <a className="skip-link" href="#main-content">
         Skip to main content
       </a>
@@ -295,7 +304,8 @@ export default function App() {
               Live Factsheet
             </h1>
             <p className="max-w-2xl text-sm text-slate-400">
-              Monitor key metrics and trends at a glance. Adjust the timeframe to explore recent performance before sharing updates with your team.
+              Monitor key metrics and trends at a glance. Adjust the timeframe to explore recent
+              performance before sharing updates with your team.
             </p>
           </div>
         </Container>

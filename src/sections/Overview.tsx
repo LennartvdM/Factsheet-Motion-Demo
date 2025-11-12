@@ -6,7 +6,7 @@ import { Button } from '../components/ui/Button';
 import { Segmented } from '../components/ui/Segmented';
 import { VisuallyHidden } from '../components/ui/VisuallyHidden';
 import { cn } from '../lib/cn';
-import type { Factset } from '../types';
+import type { Factset, KPI } from '../types';
 
 const TrendLine = lazy(() => import('../components/charts/TrendLine'));
 const BarBreakdown = lazy(() => import('../components/charts/BarBreakdown'));
@@ -16,6 +16,8 @@ type DisplayKpi = {
   label: string;
   value: string;
   delta: string;
+  valueFormatter: (value: number) => string;
+  raw: KPI;
 };
 
 type Option = {
@@ -44,7 +46,7 @@ export function Overview({
   highlights,
   onOpenDetail,
   shouldReduceMotion,
-  facts
+  facts,
 }: OverviewProps) {
   const grid = displayKpis ? (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -58,17 +60,42 @@ export function Overview({
           onOpen={onOpenDetail}
           highlighted={Boolean(highlights[kpi.id])}
           reduceMotion={shouldReduceMotion}
+          numericValue={kpi.raw.value}
+          valueFormatter={kpi.valueFormatter}
         />
       ))}
     </div>
   ) : (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {Array.from({ length: 4 }).map((_, index) => (
-        <div key={index} className="flex h-full flex-col gap-3 rounded-2xl border border-slate-800/70 bg-slate-900/40 p-6">
-          <div className={cn('h-4 w-24 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
-          <div className={cn('h-8 w-32 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
-          <div className={cn('h-4 w-20 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
-          <div className={cn('mt-auto h-3 w-16 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
+        <div
+          key={index}
+          className="flex h-full flex-col gap-3 rounded-2xl border border-slate-800/70 bg-slate-900/40 p-6"
+        >
+          <div
+            className={cn(
+              'h-4 w-24 rounded-full bg-slate-800/70',
+              !shouldReduceMotion && 'animate-pulse'
+            )}
+          />
+          <div
+            className={cn(
+              'h-8 w-32 rounded-full bg-slate-800/70',
+              !shouldReduceMotion && 'animate-pulse'
+            )}
+          />
+          <div
+            className={cn(
+              'h-4 w-20 rounded-full bg-slate-800/70',
+              !shouldReduceMotion && 'animate-pulse'
+            )}
+          />
+          <div
+            className={cn(
+              'mt-auto h-3 w-16 rounded-full bg-slate-800/70',
+              !shouldReduceMotion && 'animate-pulse'
+            )}
+          />
         </div>
       ))}
     </div>
@@ -85,7 +112,8 @@ export function Overview({
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-sky-400">Trends</p>
         <h2 className="text-2xl font-semibold text-white">Performance over time</h2>
         <p className="text-sm text-slate-400">
-          Explore how engagement evolves across the network and where regional momentum is accelerating.
+          Explore how engagement evolves across the network and where regional momentum is
+          accelerating.
         </p>
       </div>
       <Suspense
@@ -100,14 +128,24 @@ export function Overview({
             {facts ? (
               <TrendLine data={facts.trend} />
             ) : (
-              <div className={cn('h-full rounded-xl bg-slate-900/40', !shouldReduceMotion && 'animate-pulse')} />
+              <div
+                className={cn(
+                  'h-full rounded-xl bg-slate-900/40',
+                  !shouldReduceMotion && 'animate-pulse'
+                )}
+              />
             )}
           </div>
           <div className="h-72 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-4">
             {facts ? (
               <BarBreakdown data={facts.categories} />
             ) : (
-              <div className={cn('h-full rounded-xl bg-slate-900/40', !shouldReduceMotion && 'animate-pulse')} />
+              <div
+                className={cn(
+                  'h-full rounded-xl bg-slate-900/40',
+                  !shouldReduceMotion && 'animate-pulse'
+                )}
+              />
             )}
           </div>
         </div>
@@ -138,7 +176,9 @@ export function Overview({
           <h2 className="text-lg font-semibold text-white">Overview</h2>
           <p className="text-sm text-slate-400">Track activity across the selected timeframe.</p>
           {lastUpdatedLabel ? (
-            <p className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">Last updated {lastUpdatedLabel}</p>
+            <p className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">
+              Last updated {lastUpdatedLabel}
+            </p>
           ) : null}
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
@@ -156,7 +196,14 @@ export function Overview({
           </Button>
         </div>
       </section>
-      {shouldReduceMotion ? <div className="space-y-10">{grid}{trendContent}</div> : fadeContent}
+      {shouldReduceMotion ? (
+        <div className="space-y-10">
+          {grid}
+          {trendContent}
+        </div>
+      ) : (
+        fadeContent
+      )}
     </div>
   );
 }

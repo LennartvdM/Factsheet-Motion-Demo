@@ -38,7 +38,7 @@ function startFallbackSubscription(onMessage: Subscription): Unsubscribe {
     timer = setTimeout(tick, timeout);
   };
 
-  let timer = setTimeout(tick, 3000 + Math.random() * 2000);
+  let timer: ReturnType<typeof setTimeout> = setTimeout(tick, 3000 + Math.random() * 2000);
 
   return () => {
     isActive = false;
@@ -51,31 +51,94 @@ export function subscribeFacts(onMessage: Subscription): Unsubscribe {
     return startFallbackSubscription(onMessage);
   }
 
-  const eventSource = new EventSource('/sse');
-  const fallback = () => startFallbackSubscription(onMessage);
+  let eventSource: EventSource | null = null;
   let unsubscribeFallback: Unsubscribe | undefined;
+  let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
+  let reconnectAttempts = 0;
+  let isClosed = false;
 
-  eventSource.onmessage = (event) => {
+  const startFallback = () => {
+    if (!unsubscribeFallback) {
+      unsubscribeFallback = startFallbackSubscription(onMessage);
+    }
+  };
+
+  const stopFallback = () => {
+    if (unsubscribeFallback) {
+      unsubscribeFallback();
+      unsubscribeFallback = undefined;
+    }
+  };
+
+  const cleanupEventSource = () => {
+    if (eventSource) {
+      eventSource.close();
+      eventSource = null;
+    }
+  };
+
+  const scheduleReconnect = () => {
+    if (isClosed) {
+      return;
+    }
+
+    reconnectAttempts += 1;
+    const delay = Math.min(30000, 1000 * 2 ** (reconnectAttempts - 1));
+    reconnectTimer = setTimeout(() => {
+      reconnectTimer = undefined;
+      connect();
+    }, delay);
+  };
+
+  const handleMessage = (event: MessageEvent<string>) => {
     try {
       const payload = JSON.parse(event.data) as Factset;
+      stopFallback();
       onMessage(payload);
     } catch (error) {
       console.error('[client] Failed to parse SSE payload', error);
     }
   };
 
-  eventSource.onerror = () => {
-    console.warn('[client] SSE connection failed, switching to interval updates');
-    eventSource.close();
-    if (!unsubscribeFallback) {
-      unsubscribeFallback = fallback();
+  const connect = () => {
+    cleanupEventSource();
+
+    try {
+      eventSource = new EventSource('/sse');
+    } catch (error) {
+      console.error('[client] Failed to establish SSE connection', error);
+      startFallback();
+      scheduleReconnect();
+      return;
     }
+
+    reconnectAttempts = 0;
+
+    eventSource.onopen = () => {
+      reconnectAttempts = 0;
+      stopFallback();
+    };
+
+    eventSource.onmessage = handleMessage;
+
+    eventSource.onerror = () => {
+      console.warn('[client] SSE connection error, attempting to reconnect');
+      startFallback();
+      if (eventSource) {
+        eventSource.close();
+      }
+      scheduleReconnect();
+    };
   };
 
+  connect();
+
   return () => {
-    eventSource.close();
-    if (unsubscribeFallback) {
-      unsubscribeFallback();
+    isClosed = true;
+    cleanupEventSource();
+    if (reconnectTimer) {
+      clearTimeout(reconnectTimer);
     }
+    stopFallback();
   };
 }

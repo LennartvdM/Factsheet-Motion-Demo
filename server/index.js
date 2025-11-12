@@ -24,7 +24,7 @@ app.get('/sse', (req, res) => {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
     Connection: 'keep-alive',
-    'X-Accel-Buffering': 'no'
+    'X-Accel-Buffering': 'no',
   });
 
   res.write(`data: ${JSON.stringify(currentFacts)}\n\n`);
@@ -39,18 +39,51 @@ app.get('/sse', (req, res) => {
 
     const delay = 3000 + Math.random() * 2000;
     timer = setTimeout(() => {
+      if (!active || res.writableEnded) {
+        return;
+      }
+
       currentFacts = mockStream.next();
-      res.write(`data: ${JSON.stringify(currentFacts)}\n\n`);
+      try {
+        res.write(`data: ${JSON.stringify(currentFacts)}\n\n`);
+      } catch (error) {
+        console.warn('[server] Failed to write SSE update', error);
+        handleDisconnect('write failed', error);
+        return;
+      }
       scheduleNext();
     }, delay);
   };
 
   scheduleNext();
 
-  req.on('close', () => {
+  const handleDisconnect = (reason, error) => {
+    if (!active) {
+      return;
+    }
+
     active = false;
     clearTimeout(timer);
-  });
+
+    if (error) {
+      console.warn(`[server] SSE connection closed (${reason})`, error);
+    } else {
+      console.warn(`[server] SSE connection closed (${reason})`);
+    }
+
+    if (!res.writableEnded) {
+      try {
+        res.end();
+      } catch (endError) {
+        console.warn('[server] Failed to terminate SSE response', endError);
+      }
+    }
+  };
+
+  req.on('close', () => handleDisconnect('client closed'));
+  req.on('aborted', () => handleDisconnect('client aborted'));
+  req.on('error', (error) => handleDisconnect('request error', error));
+  res.on('error', (error) => handleDisconnect('response error', error));
 });
 
 if (isProduction) {

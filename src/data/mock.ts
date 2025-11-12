@@ -3,7 +3,7 @@ import {
   createSeededRandom as createSeededRandomImpl,
   createMockStream as createMockStreamImpl,
   generateInitialFactset as generateInitialFactsetImpl,
-  nextTick as nextTickImpl
+  nextTick as nextTickImpl,
 } from '../../server/mock-data.js';
 
 export const createSeededRandom: (seed?: number) => () => number = createSeededRandomImpl;
@@ -25,6 +25,6 @@ export function createMockStream(seed?: number) {
     },
     next(): Factset {
       return stream.next() as Factset;
-    }
+    },
   };
 }

@@ -18,7 +18,15 @@ type KpiDetailProps = {
   onClose: () => void;
 };
 
-export function KpiDetail({ kpi, formattedValue, formattedDelta, generatedAt, trend, categories, onClose }: KpiDetailProps) {
+export function KpiDetail({
+  kpi,
+  formattedValue,
+  formattedDelta,
+  generatedAt,
+  trend,
+  categories,
+  onClose,
+}: KpiDetailProps) {
   const { id, label } = kpi;
   const headingRef = useRef<HTMLHeadingElement>(null);
 
@@ -84,15 +92,22 @@ export function KpiDetail({ kpi, formattedValue, formattedDelta, generatedAt, tr
                 {formattedDelta} vs last period
               </p>
               <p className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">
-                Updated {new Date(generatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                Updated{' '}
+                {new Date(generatedAt).toLocaleTimeString([], {
+                  hour: 'numeric',
+                  minute: '2-digit',
+                })}
               </p>
             </div>
             <p className="text-sm leading-relaxed text-slate-300">
-              Compare performance over time, track the inflection points, and determine how this metric influences the rest of
-              the dashboard. View transitions provide a sense of continuity between summary cards and detailed breakdowns.
+              Compare performance over time, track the inflection points, and determine how this
+              metric influences the rest of the dashboard. View transitions provide a sense of
+              continuity between summary cards and detailed breakdowns.
             </p>
             <div className="space-y-4">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Charts</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                Charts
+              </h3>
               <Suspense
                 fallback={
                   <div className="flex h-[30rem] items-center justify-center rounded-2xl border border-slate-800/60 bg-slate-900/40 text-sm text-slate-400">

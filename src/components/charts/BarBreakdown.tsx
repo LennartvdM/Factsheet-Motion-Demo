@@ -1,14 +1,6 @@
 import { useId } from 'react';
 import { useReducedMotion } from 'framer-motion';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import type { CategoryBreakdown } from '../../types';
 
@@ -31,7 +23,12 @@ export default function BarBreakdown({ data, fillColor = '#22d3ee' }: BarBreakdo
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.12)" vertical={false} />
-        <XAxis dataKey="category" tickLine={false} axisLine={false} stroke="rgba(148, 163, 184, 0.6)" />
+        <XAxis
+          dataKey="category"
+          tickLine={false}
+          axisLine={false}
+          stroke="rgba(148, 163, 184, 0.6)"
+        />
         <YAxis
           tickLine={false}
           axisLine={false}
@@ -49,7 +46,12 @@ export default function BarBreakdown({ data, fillColor = '#22d3ee' }: BarBreakdo
           }}
           labelStyle={{ color: '#cbd5f5', fontWeight: 500 }}
         />
-        <Bar dataKey="value" fill={`url(#${gradientId})`} radius={[10, 10, 8, 8]} isAnimationActive={!shouldReduceMotion} />
+        <Bar
+          dataKey="value"
+          fill={`url(#${gradientId})`}
+          radius={[10, 10, 8, 8]}
+          isAnimationActive={!shouldReduceMotion}
+        />
       </BarChart>
     </ResponsiveContainer>
   );

@@ -9,12 +9,12 @@ export default defineConfig({
     proxy: {
       '/sse': {
         target: 'http://localhost:5174',
-        changeOrigin: true
+        changeOrigin: true,
       },
       '/facts': {
         target: 'http://localhost:5174',
-        changeOrigin: true
-      }
-    }
-  }
+        changeOrigin: true,
+      },
+    },
+  },
 });

@@ -23,7 +23,7 @@ export function Breakdown({
   timeframeOptions,
   onTimeframeChange,
   shouldReduceMotion,
-  facts
+  facts,
 }: BreakdownProps) {
   const categories = facts?.categories ?? [];
   const total = categories.reduce((sum, item) => sum + item.value, 0);
@@ -44,10 +44,15 @@ export function Breakdown({
             const percentage = total === 0 ? 0 : Math.round((category.value / total) * 100);
             const barWidth = maxValue === 0 ? 0 : Math.max((category.value / maxValue) * 100, 4);
             return (
-              <div key={category.category} className="space-y-2 rounded-2xl border border-slate-800/70 bg-slate-900/50 p-4">
+              <div
+                key={category.category}
+                className="space-y-2 rounded-2xl border border-slate-800/70 bg-slate-900/50 p-4"
+              >
                 <div className="flex items-center justify-between text-sm text-slate-300">
                   <p className="font-semibold text-white">{category.category}</p>
-                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500">{percentage}%</span>
+                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                    {percentage}%
+                  </span>
                 </div>
                 <div className="h-2 rounded-full bg-slate-800/70">
                   <div
@@ -57,7 +62,11 @@ export function Breakdown({
                   />
                 </div>
                 <p className="text-xs text-slate-400">
-                  {category.value.toLocaleString('en-US', { style: 'decimal', maximumFractionDigits: 0 })} interactions
+                  {category.value.toLocaleString('en-US', {
+                    style: 'decimal',
+                    maximumFractionDigits: 0,
+                  })}{' '}
+                  interactions
                 </p>
               </div>
             );
@@ -65,13 +74,36 @@ export function Breakdown({
         ) : (
           <div className="space-y-3">
             {Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="space-y-2 rounded-2xl border border-slate-800/70 bg-slate-900/50 p-4">
+              <div
+                key={index}
+                className="space-y-2 rounded-2xl border border-slate-800/70 bg-slate-900/50 p-4"
+              >
                 <div className="flex items-center justify-between text-sm">
-                  <div className={cn('h-4 w-28 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
-                  <div className={cn('h-3 w-12 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
+                  <div
+                    className={cn(
+                      'h-4 w-28 rounded-full bg-slate-800/70',
+                      !shouldReduceMotion && 'animate-pulse'
+                    )}
+                  />
+                  <div
+                    className={cn(
+                      'h-3 w-12 rounded-full bg-slate-800/70',
+                      !shouldReduceMotion && 'animate-pulse'
+                    )}
+                  />
                 </div>
-                <div className={cn('h-2 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
-                <div className={cn('h-3 w-20 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
+                <div
+                  className={cn(
+                    'h-2 rounded-full bg-slate-800/70',
+                    !shouldReduceMotion && 'animate-pulse'
+                  )}
+                />
+                <div
+                  className={cn(
+                    'h-3 w-20 rounded-full bg-slate-800/70',
+                    !shouldReduceMotion && 'animate-pulse'
+                  )}
+                />
               </div>
             ))}
           </div>
@@ -85,7 +117,9 @@ export function Breakdown({
       <section className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
           <h2 className="text-lg font-semibold text-white">Breakdown</h2>
-          <p className="text-sm text-slate-400">Dive into category level performance and trending segments.</p>
+          <p className="text-sm text-slate-400">
+            Dive into category level performance and trending segments.
+          </p>
         </div>
         <div role="group" aria-labelledby="breakdown-timeframe-label">
           <VisuallyHidden id="breakdown-timeframe-label">Select timeframe</VisuallyHidden>
@@ -101,27 +135,41 @@ export function Breakdown({
         <div className="space-y-6">
           {categories.length > 0 ? (
             categories.map((category) => (
-              <div key={category.category} className="space-y-2 rounded-2xl border border-slate-800/70 bg-slate-900/50 p-4">
+              <div
+                key={category.category}
+                className="space-y-2 rounded-2xl border border-slate-800/70 bg-slate-900/50 p-4"
+              >
                 <div className="flex items-center justify-between text-sm text-slate-300">
                   <p className="font-semibold text-white">{category.category}</p>
-                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500">{total === 0 ? 0 : Math.round((category.value / total) * 100)}%</span>
+                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                    {total === 0 ? 0 : Math.round((category.value / total) * 100)}%
+                  </span>
                 </div>
                 <div className="h-2 rounded-full bg-slate-800/70">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-sky-400 to-sky-600"
-                    style={{ width: `${maxValue === 0 ? 0 : Math.max((category.value / maxValue) * 100, 4)}%` }}
+                    style={{
+                      width: `${maxValue === 0 ? 0 : Math.max((category.value / maxValue) * 100, 4)}%`,
+                    }}
                     aria-hidden="true"
                   />
                 </div>
                 <p className="text-xs text-slate-400">
-                  {category.value.toLocaleString('en-US', { style: 'decimal', maximumFractionDigits: 0 })} interactions
+                  {category.value.toLocaleString('en-US', {
+                    style: 'decimal',
+                    maximumFractionDigits: 0,
+                  })}{' '}
+                  interactions
                 </p>
               </div>
             ))
           ) : (
             <div className="space-y-3">
               {Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="space-y-2 rounded-2xl border border-slate-800/70 bg-slate-900/50 p-4">
+                <div
+                  key={index}
+                  className="space-y-2 rounded-2xl border border-slate-800/70 bg-slate-900/50 p-4"
+                >
                   <div className="flex items-center justify-between text-sm">
                     <div className="h-4 w-28 rounded-full bg-slate-800/70" />
                     <div className="h-3 w-12 rounded-full bg-slate-800/70" />

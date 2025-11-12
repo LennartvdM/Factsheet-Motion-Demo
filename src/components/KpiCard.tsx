@@ -1,3 +1,4 @@
+import { AnimatedNumber } from './AnimatedNumber';
 import { cn } from '../lib/cn';
 
 type KpiCardProps = {
@@ -8,9 +9,21 @@ type KpiCardProps = {
   onOpen: (id: string) => void;
   highlighted?: boolean;
   reduceMotion?: boolean;
+  numericValue?: number;
+  valueFormatter?: (value: number) => string;
 };
 
-export function KpiCard({ id, label, value, delta, onOpen, highlighted = false, reduceMotion = false }: KpiCardProps) {
+export function KpiCard({
+  id,
+  label,
+  value,
+  delta,
+  onOpen,
+  highlighted = false,
+  reduceMotion = false,
+  numericValue,
+  valueFormatter,
+}: KpiCardProps) {
   const isNegative = delta.trim().startsWith('-');
   const labelId = `kpi-${id}-label`;
   const valueId = `kpi-${id}-value`;
@@ -34,7 +47,15 @@ export function KpiCard({ id, label, value, delta, onOpen, highlighted = false, 
         {label}
       </span>
       <span id={valueId} className="text-3xl font-semibold text-white">
-        {value}
+        {typeof numericValue === 'number' && valueFormatter ? (
+          <AnimatedNumber
+            value={numericValue}
+            format={valueFormatter}
+            shouldReduceMotion={reduceMotion}
+          />
+        ) : (
+          value
+        )}
       </span>
       <span
         className={cn('text-sm font-semibold', isNegative ? 'text-rose-400' : 'text-emerald-400')}

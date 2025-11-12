@@ -23,12 +23,12 @@ type SegmentedProps = {
 
 const containerRoles: Record<SegmentedType, string> = {
   radio: 'radiogroup',
-  tab: 'tablist'
+  tab: 'tablist',
 };
 
 const itemRoles: Record<SegmentedType, string> = {
   radio: 'radio',
-  tab: 'tab'
+  tab: 'tab',
 };
 
 export const Segmented = forwardRef<HTMLDivElement, SegmentedProps>(function Segmented(

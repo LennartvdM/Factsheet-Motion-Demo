@@ -68,7 +68,11 @@ export default function TrendLine({ data, accentColor = '#38bdf8' }: TrendLinePr
           dataKey="value"
           stroke={accentColor}
           strokeWidth={2.5}
-          dot={shouldReduceMotion ? false : { r: 4, strokeWidth: 2, fill: '#0f172a', stroke: accentColor }}
+          dot={
+            shouldReduceMotion
+              ? false
+              : { r: 4, strokeWidth: 2, fill: '#0f172a', stroke: accentColor }
+          }
           activeDot={{ r: 6, strokeWidth: 0, fill: accentColor }}
           isAnimationActive={!shouldReduceMotion}
         />

@@ -4,8 +4,7 @@ import { cn } from '../../lib/cn';
 
 type ButtonVariant = 'primary' | 'ghost';
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
 }
 

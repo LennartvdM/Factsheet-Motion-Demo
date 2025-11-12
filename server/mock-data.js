@@ -1,8 +1,36 @@
 const KPI_CONFIG = [
-  { id: 'active-users', label: 'Active Users', unit: 'count', base: 1248, volatility: 0.08, deltaRange: [-0.04, 0.14] },
-  { id: 'new-signups', label: 'New Signups', unit: 'count', base: 342, volatility: 0.12, deltaRange: [-0.06, 0.18] },
-  { id: 'retention', label: 'Retention', unit: 'percent', base: 0.78, volatility: 0.04, deltaRange: [-0.05, 0.08] },
-  { id: 'revenue', label: 'Revenue', unit: 'currency', base: 24300, volatility: 0.07, deltaRange: [-0.03, 0.12] }
+  {
+    id: 'active-users',
+    label: 'Active Users',
+    unit: 'count',
+    base: 1248,
+    volatility: 0.08,
+    deltaRange: [-0.04, 0.14],
+  },
+  {
+    id: 'new-signups',
+    label: 'New Signups',
+    unit: 'count',
+    base: 342,
+    volatility: 0.12,
+    deltaRange: [-0.06, 0.18],
+  },
+  {
+    id: 'retention',
+    label: 'Retention',
+    unit: 'percent',
+    base: 0.78,
+    volatility: 0.04,
+    deltaRange: [-0.05, 0.08],
+  },
+  {
+    id: 'revenue',
+    label: 'Revenue',
+    unit: 'currency',
+    base: 24300,
+    volatility: 0.07,
+    deltaRange: [-0.03, 0.12],
+  },
 ];
 
 const CATEGORY_CONFIG = [
@@ -10,7 +38,7 @@ const CATEGORY_CONFIG = [
   { category: 'South', base: 280 },
   { category: 'East', base: 360 },
   { category: 'West', base: 300 },
-  { category: 'Online', base: 420 }
+  { category: 'Online', base: 420 },
 ];
 
 const TREND_POINTS = 12;
@@ -66,14 +94,14 @@ function createKpi(config, random, timestamp) {
     unit,
     value,
     delta,
-    updatedAt: new Date(timestamp).toISOString()
+    updatedAt: new Date(timestamp).toISOString(),
   };
 }
 
 function formatTimeLabel(timestamp) {
   return new Intl.DateTimeFormat('en-US', {
     hour: 'numeric',
-    minute: '2-digit'
+    minute: '2-digit',
   }).format(new Date(timestamp));
 }
 
@@ -98,7 +126,7 @@ function generateTrend(random, baseTimestamp) {
 function generateCategories(random) {
   return CATEGORY_CONFIG.map((category) => ({
     category: category.category,
-    value: Math.max(0, Math.round(category.base * (0.85 + random() * 0.25)))
+    value: Math.max(0, Math.round(category.base * (0.85 + random() * 0.25))),
   }));
 }
 
@@ -110,7 +138,7 @@ export function generateInitialFactset(randomOrSeed) {
     generatedAt: new Date(generatedAt).toISOString(),
     kpis: KPI_CONFIG.map((config) => createKpi(config, random, generatedAt)),
     trend: generateTrend(random, generatedAt),
-    categories: generateCategories(random)
+    categories: generateCategories(random),
   };
 }
 
@@ -141,28 +169,28 @@ export function nextTick(previousFactset, randomOrSeed) {
       ...kpi,
       value: nextValue,
       delta: Number(nextDelta.toFixed(3)),
-      updatedAt: new Date(generatedAt).toISOString()
+      updatedAt: new Date(generatedAt).toISOString(),
     };
   });
 
-  const trendSeed = previousFactset.trend.length ? previousFactset.trend[previousFactset.trend.length - 1].value : 940;
-  const trend = previousFactset.trend
-    .slice(-(TREND_POINTS - 1))
-    .concat({
-      date: formatTimeLabel(generatedAt),
-      value: Math.max(120, Math.round(trendSeed * (1 + (random() - 0.5) * 0.14)))
-    });
+  const trendSeed = previousFactset.trend.length
+    ? previousFactset.trend[previousFactset.trend.length - 1].value
+    : 940;
+  const trend = previousFactset.trend.slice(-(TREND_POINTS - 1)).concat({
+    date: formatTimeLabel(generatedAt),
+    value: Math.max(120, Math.round(trendSeed * (1 + (random() - 0.5) * 0.14))),
+  });
 
   const categories = previousFactset.categories.map((category) => ({
     category: category.category,
-    value: Math.max(0, Math.round(category.value * (0.94 + random() * 0.12)))
+    value: Math.max(0, Math.round(category.value * (0.94 + random() * 0.12))),
   }));
 
   return {
     generatedAt: new Date(generatedAt).toISOString(),
     kpis,
     trend,
-    categories
+    categories,
   };
 }
 
@@ -177,6 +205,6 @@ export function createMockStream(seed = 1337) {
     next() {
       current = nextTick(current, random);
       return clone(current);
-    }
+    },
   };
 }
