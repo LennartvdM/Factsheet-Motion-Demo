@@ -1,8 +1,0 @@
-node_modules
-.DS_Store
-dist
-.idea
-.vscode
-npm-debug.log*
-pnpm-lock.yaml
-yarn.lock
