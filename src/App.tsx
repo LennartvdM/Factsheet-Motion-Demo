@@ -2,11 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 
 import { KpiDetail } from './components/KpiDetail';
+import { ThemeToggle } from './components/ThemeToggle';
 import { Container } from './components/ui/Container';
 import { Segmented } from './components/ui/Segmented';
 import { VisuallyHidden } from './components/ui/VisuallyHidden';
 import { withViewTransition } from './lib/viewTransition';
 import { getInitialFacts, subscribeFacts } from './data/client';
+import { ThemeProvider } from './theme/ThemeProvider';
 import type { Factset, KPI } from './types';
 
 import { Breakdown } from './sections/Breakdown';
@@ -280,71 +282,78 @@ export default function App() {
   })();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100" data-contrast={prefersHighContrast ? 'more' : undefined}>
-      <a className="skip-link" href="#main-content">
-        Skip to main content
-      </a>
-      <VisuallyHidden aria-live="polite" role="status" aria-atomic="true">
-        {liveAnnouncement}
-      </VisuallyHidden>
-      <header className="border-b border-slate-900/70 bg-slate-950/80 backdrop-blur">
-        <Container className="flex flex-col gap-4 py-10">
-          <div className="flex flex-col gap-2">
-            <p className="text-sm font-medium uppercase tracking-wide text-sky-400">Dashboard</p>
-            <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-              Live Factsheet
-            </h1>
-            <p className="max-w-2xl text-sm text-slate-400">
-              Monitor key metrics and trends at a glance. Adjust the timeframe to explore recent performance before sharing updates with your team.
-            </p>
-          </div>
-        </Container>
-      </header>
-      <main id="main-content" className="py-12" tabIndex={-1}>
-        <Container className="space-y-10">
-          <div className="flex flex-col gap-3">
-            <VisuallyHidden id="section-tabs-label">Select dashboard section</VisuallyHidden>
-            <Segmented
-              type="tab"
-              options={tabOptions}
-              value={activeTab}
-              onValueChange={handleTabChange}
-              ariaLabelledBy="section-tabs-label"
-            />
-          </div>
-          {shouldReduceMotion ? (
-            <div id={`tab-panel-${activeTab}`} role="tabpanel" aria-labelledby={`tab-${activeTab}`}>
-              {tabPanel}
+    <ThemeProvider>
+      <div
+        className="min-h-screen bg-[rgb(var(--color-bg))] text-[rgb(var(--color-text))] transition-colors"
+        data-contrast={prefersHighContrast ? 'more' : undefined}
+      >
+        <a className="skip-link" href="#main-content">
+          Skip to main content
+        </a>
+        <VisuallyHidden aria-live="polite" role="status" aria-atomic="true">
+          {liveAnnouncement}
+        </VisuallyHidden>
+        <header className="border-b border-soft bg-[rgba(var(--color-surface-muted),0.75)] backdrop-blur">
+          <Container className="flex flex-col gap-6 py-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-accent">Dashboard</p>
+                <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Live Factsheet</h1>
+              </div>
+              <ThemeToggle />
             </div>
-          ) : (
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={activeTab}
-                id={`tab-panel-${activeTab}`}
-                role="tabpanel"
-                aria-labelledby={`tab-${activeTab}`}
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -24 }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
-              >
+            <p className="max-w-2xl text-sm text-subtle">
+              Monitor key metrics and trends at a glance. Adjust the timeframe to explore recent performance before sharing
+              updates with your team.
+            </p>
+          </Container>
+        </header>
+        <main id="main-content" className="py-12" tabIndex={-1}>
+          <Container className="space-y-10">
+            <div className="flex flex-col gap-3">
+              <VisuallyHidden id="section-tabs-label">Select dashboard section</VisuallyHidden>
+              <Segmented
+                type="tab"
+                options={tabOptions}
+                value={activeTab}
+                onValueChange={handleTabChange}
+                ariaLabelledBy="section-tabs-label"
+              />
+            </div>
+            {shouldReduceMotion ? (
+              <div id={`tab-panel-${activeTab}`} role="tabpanel" aria-labelledby={`tab-${activeTab}`}>
                 {tabPanel}
-              </motion.div>
-            </AnimatePresence>
-          )}
-        </Container>
-      </main>
-      {activeKpi && facts ? (
-        <KpiDetail
-          kpi={activeKpi.raw}
-          formattedValue={activeKpi.value}
-          formattedDelta={activeKpi.delta}
-          generatedAt={facts.generatedAt}
-          trend={facts.trend}
-          categories={facts.categories}
-          onClose={handleCloseDetail}
-        />
-      ) : null}
-    </div>
+              </div>
+            ) : (
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={activeTab}
+                  id={`tab-panel-${activeTab}`}
+                  role="tabpanel"
+                  aria-labelledby={`tab-${activeTab}`}
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -24 }}
+                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                >
+                  {tabPanel}
+                </motion.div>
+              </AnimatePresence>
+            )}
+          </Container>
+        </main>
+        {activeKpi && facts ? (
+          <KpiDetail
+            kpi={activeKpi.raw}
+            formattedValue={activeKpi.value}
+            formattedDelta={activeKpi.delta}
+            generatedAt={facts.generatedAt}
+            trend={facts.trend}
+            categories={facts.categories}
+            onClose={handleCloseDetail}
+          />
+        ) : null}
+      </div>
+    </ThemeProvider>
   );
 }

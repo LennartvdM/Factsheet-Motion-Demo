@@ -37,21 +37,29 @@ export function Notes({ timeframe, timeframeOptions, onTimeframeChange, shouldRe
         transition={shouldReduceMotion ? undefined : { duration: 0.24, ease: 'easeOut' }}
         className="space-y-6"
       >
-        <p className="text-sm text-slate-300">{timeframeDescriptions[timeframe] ?? timeframeDescriptions.today}</p>
+        <p className="text-sm text-muted">{timeframeDescriptions[timeframe] ?? timeframeDescriptions.today}</p>
         <ul className="space-y-3">
           {topKpis.length > 0 ? (
             topKpis.map((kpi) => (
-              <li key={kpi.id} className="rounded-2xl border border-slate-800/70 bg-slate-900/50 p-4">
-                <p className="text-sm font-semibold text-white">{kpi.label}</p>
-                <p className="text-xs text-slate-400">Updated {new Date(kpi.updatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</p>
+              <li
+                key={kpi.id}
+                className="rounded-2xl border border-soft bg-[rgba(var(--color-card),0.7)] p-4 transition-colors"
+              >
+                <p className="text-sm font-semibold">{kpi.label}</p>
+                <p className="text-xs text-subtle">
+                  Updated {new Date(kpi.updatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                </p>
               </li>
             ))
           ) : (
             <>
               {Array.from({ length: 3 }).map((_, index) => (
-                <li key={index} className="rounded-2xl border border-slate-800/70 bg-slate-900/50 p-4">
-                  <div className={cn('h-4 w-40 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
-                  <div className={cn('mt-2 h-3 w-24 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
+                <li
+                  key={index}
+                  className="rounded-2xl border border-soft bg-[rgba(var(--color-card),0.7)] p-4 transition-colors"
+                >
+                  <div className={cn('h-4 w-40 rounded-full bg-[rgba(var(--color-border),0.35)]', !shouldReduceMotion && 'animate-pulse')} />
+                  <div className={cn('mt-2 h-3 w-24 rounded-full bg-[rgba(var(--color-border),0.35)]', !shouldReduceMotion && 'animate-pulse')} />
                 </li>
               ))}
             </>
@@ -65,8 +73,8 @@ export function Notes({ timeframe, timeframeOptions, onTimeframeChange, shouldRe
     <div className="space-y-8">
       <section className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
-          <h2 className="text-lg font-semibold text-white">Notes</h2>
-          <p className="text-sm text-slate-400">Capture quick talking points to share with your stakeholders.</p>
+          <h2 className="text-lg font-semibold">Notes</h2>
+          <p className="text-sm text-subtle">Capture quick talking points to share with your stakeholders.</p>
         </div>
         <div role="group" aria-labelledby="notes-timeframe-label">
           <VisuallyHidden id="notes-timeframe-label">Select timeframe</VisuallyHidden>
@@ -80,21 +88,29 @@ export function Notes({ timeframe, timeframeOptions, onTimeframeChange, shouldRe
       </section>
       {shouldReduceMotion ? (
         <div className="space-y-6">
-          <p className="text-sm text-slate-300">{timeframeDescriptions[timeframe] ?? timeframeDescriptions.today}</p>
+          <p className="text-sm text-muted">{timeframeDescriptions[timeframe] ?? timeframeDescriptions.today}</p>
           <ul className="space-y-3">
             {topKpis.length > 0 ? (
               topKpis.map((kpi) => (
-                <li key={kpi.id} className="rounded-2xl border border-slate-800/70 bg-slate-900/50 p-4">
-                  <p className="text-sm font-semibold text-white">{kpi.label}</p>
-                  <p className="text-xs text-slate-400">Updated {new Date(kpi.updatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</p>
+                <li
+                  key={kpi.id}
+                  className="rounded-2xl border border-soft bg-[rgba(var(--color-card),0.7)] p-4 transition-colors"
+                >
+                  <p className="text-sm font-semibold">{kpi.label}</p>
+                  <p className="text-xs text-subtle">
+                    Updated {new Date(kpi.updatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                  </p>
                 </li>
               ))
             ) : (
               <>
                 {Array.from({ length: 3 }).map((_, index) => (
-                  <li key={index} className="rounded-2xl border border-slate-800/70 bg-slate-900/50 p-4">
-                    <div className="h-4 w-40 rounded-full bg-slate-800/70" />
-                    <div className="mt-2 h-3 w-24 rounded-full bg-slate-800/70" />
+                  <li
+                    key={index}
+                    className="rounded-2xl border border-soft bg-[rgba(var(--color-card),0.7)] p-4 transition-colors"
+                  >
+                    <div className="h-4 w-40 rounded-full bg-[rgba(var(--color-border),0.35)]" />
+                    <div className="mt-2 h-3 w-24 rounded-full bg-[rgba(var(--color-border),0.35)]" />
                   </li>
                 ))}
               </>

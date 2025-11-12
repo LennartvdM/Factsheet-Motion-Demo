@@ -108,7 +108,7 @@ export const Segmented = forwardRef<HTMLDivElement, SegmentedProps>(function Seg
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
       className={cn(
-        'inline-flex items-center gap-1 rounded-2xl border border-slate-800/80 bg-slate-900/60 p-1 shadow-inner shadow-slate-900/40',
+        'inline-flex items-center gap-1 rounded-2xl border border-soft bg-[rgba(var(--color-surface-muted),0.65)] p-1 shadow-inner shadow-[rgba(var(--color-overlay),0.15)] transition-colors',
         className
       )}
     >
@@ -134,10 +134,10 @@ export const Segmented = forwardRef<HTMLDivElement, SegmentedProps>(function Seg
             }}
             onKeyDown={(event) => handleKeyDown(event, index)}
             className={cn(
-              'relative rounded-xl px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
+              'relative rounded-xl px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-bg))]',
               isActive
-                ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/20'
-                : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
+                ? 'bg-[rgb(var(--color-accent))] text-white shadow-sm'
+                : 'text-muted hover:bg-[rgba(var(--color-card),0.85)] hover:text-[rgb(var(--color-text))]'
             )}
           >
             {option.label}
