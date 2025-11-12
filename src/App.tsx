@@ -1,10 +1,12 @@
 import { useState } from 'react';
 
+import { KpiCard } from './components/KpiCard';
+import { KpiDetail } from './components/KpiDetail';
 import { Button } from './components/ui/Button';
-import { Card } from './components/ui/Card';
 import { Container } from './components/ui/Container';
 import { VisuallyHidden } from './components/ui/VisuallyHidden';
 import { cn } from './lib/cn';
+import { withViewTransition } from './lib/viewTransition';
 
 const timeframeOptions = [
   { label: 'Today', value: 'today' },
@@ -13,14 +15,35 @@ const timeframeOptions = [
 ];
 
 const kpis = [
-  { label: 'Active Users', value: '1,248', change: '+12%' },
-  { label: 'New Signups', value: '342', change: '+8%' },
-  { label: 'Retention', value: '78%', change: '-3%' },
-  { label: 'Revenue', value: '$24.3K', change: '+5%' },
+  { id: 'active-users', label: 'Active Users', value: '1,248', delta: '+12%' },
+  { id: 'new-signups', label: 'New Signups', value: '342', delta: '+8%' },
+  { id: 'retention', label: 'Retention', value: '78%', delta: '-3%' },
+  { id: 'revenue', label: 'Revenue', value: '$24.3K', delta: '+5%' },
 ];
 
 export default function App() {
   const [timeframe, setTimeframe] = useState<string>(timeframeOptions[0]?.value ?? 'today');
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  const handleTimeframeChange = (value: string) => {
+    withViewTransition(() => {
+      setTimeframe(value);
+    });
+  };
+
+  const handleOpenDetail = (id: string) => {
+    withViewTransition(() => {
+      setOpenId(id);
+    });
+  };
+
+  const handleCloseDetail = () => {
+    withViewTransition(() => {
+      setOpenId(null);
+    });
+  };
+
+  const activeKpi = openId ? kpis.find((kpi) => kpi.id === openId) : undefined;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -58,7 +81,7 @@ export default function App() {
                       key={option.value}
                       type="button"
                       aria-pressed={isActive}
-                      onClick={() => setTimeframe(option.value)}
+                      onClick={() => handleTimeframeChange(option.value)}
                       className={cn(
                         'relative rounded-xl px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
                         isActive
@@ -78,27 +101,14 @@ export default function App() {
           </section>
           <section>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {kpis.map((kpi) => {
-                const isNegative = kpi.change.startsWith('-');
-                return (
-                  <Card key={kpi.label} className="space-y-4">
-                    <div className="text-sm font-medium text-slate-400">{kpi.label}</div>
-                    <div className="text-3xl font-semibold text-white">{kpi.value}</div>
-                    <div
-                      className={cn(
-                        'text-sm font-semibold',
-                        isNegative ? 'text-rose-400' : 'text-emerald-400'
-                      )}
-                    >
-                      {kpi.change} vs last period
-                    </div>
-                  </Card>
-                );
-              })}
+              {kpis.map((kpi) => (
+                <KpiCard key={kpi.id} {...kpi} onOpen={handleOpenDetail} />
+              ))}
             </div>
           </section>
         </Container>
       </main>
+      {activeKpi ? <KpiDetail {...activeKpi} onClose={handleCloseDetail} /> : null}
     </div>
   );
 }
