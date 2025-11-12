@@ -6,9 +6,11 @@ type KpiCardProps = {
   value: string;
   delta: string;
   onOpen: (id: string) => void;
+  highlighted?: boolean;
+  reduceMotion?: boolean;
 };
 
-export function KpiCard({ id, label, value, delta, onOpen }: KpiCardProps) {
+export function KpiCard({ id, label, value, delta, onOpen, highlighted = false, reduceMotion = false }: KpiCardProps) {
   const isNegative = delta.trim().startsWith('-');
   const labelId = `kpi-${id}-label`;
   const valueId = `kpi-${id}-value`;
@@ -19,7 +21,12 @@ export function KpiCard({ id, label, value, delta, onOpen }: KpiCardProps) {
       aria-labelledby={`${labelId} ${valueId}`}
       onClick={() => onOpen(id)}
       className={cn(
-        'group flex h-full flex-col gap-3 rounded-2xl border border-slate-800/70 bg-slate-900/60 p-6 text-left shadow-lg shadow-slate-950/20 backdrop-blur transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 hover:border-slate-700 hover:bg-slate-900/80 hover:shadow-slate-900/40'
+        'group flex h-full flex-col gap-3 rounded-2xl border border-slate-800/70 bg-slate-900/60 p-6 text-left shadow-lg shadow-slate-950/20 backdrop-blur transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 hover:border-slate-700 hover:bg-slate-900/80 hover:shadow-slate-900/40',
+        highlighted
+          ? reduceMotion
+            ? 'border-sky-500/70 shadow-sky-500/30'
+            : 'border-sky-500/70 shadow-sky-500/40 animate-pulse'
+          : undefined
       )}
       style={{ viewTransitionName: `kpi-${id}` }}
     >

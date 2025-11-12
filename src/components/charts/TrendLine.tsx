@@ -11,13 +11,10 @@ import {
   YAxis,
 } from 'recharts';
 
-export type TrendDatum = {
-  date: string;
-  value: number;
-};
+import type { TrendPoint } from '../../types';
 
 type TrendLineProps = {
-  data: TrendDatum[];
+  data: TrendPoint[];
   accentColor?: string;
 };
 
