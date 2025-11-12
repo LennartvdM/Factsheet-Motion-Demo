@@ -10,13 +10,10 @@ import {
   YAxis,
 } from 'recharts';
 
-export type BarDatum = {
-  category: string;
-  value: number;
-};
+import type { CategoryBreakdown } from '../../types';
 
 type BarBreakdownProps = {
-  data: BarDatum[];
+  data: CategoryBreakdown[];
   fillColor?: string;
 };
 

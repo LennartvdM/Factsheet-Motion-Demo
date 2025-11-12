@@ -1,4 +1,4 @@
-import { Suspense, lazy, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 
 import { KpiCard } from './components/KpiCard';
@@ -8,7 +8,8 @@ import { Container } from './components/ui/Container';
 import { VisuallyHidden } from './components/ui/VisuallyHidden';
 import { cn } from './lib/cn';
 import { withViewTransition } from './lib/viewTransition';
-import { categoryBreakdown, trendData } from './lib/chartData';
+import { getInitialFacts, subscribeFacts } from './data/client';
+import type { Factset, KPI } from './types';
 
 const TrendLine = lazy(() => import('./components/charts/TrendLine'));
 const BarBreakdown = lazy(() => import('./components/charts/BarBreakdown'));
@@ -16,20 +17,151 @@ const BarBreakdown = lazy(() => import('./components/charts/BarBreakdown'));
 const timeframeOptions = [
   { label: 'Today', value: 'today' },
   { label: '7d', value: '7d' },
-  { label: '30d', value: '30d' },
+  { label: '30d', value: '30d' }
 ];
 
-const kpis = [
-  { id: 'active-users', label: 'Active Users', value: '1,248', delta: '+12%' },
-  { id: 'new-signups', label: 'New Signups', value: '342', delta: '+8%' },
-  { id: 'retention', label: 'Retention', value: '78%', delta: '-3%' },
-  { id: 'revenue', label: 'Revenue', value: '$24.3K', delta: '+5%' },
-];
+const integerFormatter = new Intl.NumberFormat('en-US');
+const compactCurrencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 1,
+  notation: 'compact'
+});
+const percentValueFormatter = new Intl.NumberFormat('en-US', {
+  style: 'percent',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0
+});
+const percentDeltaFormatter = new Intl.NumberFormat('en-US', {
+  style: 'percent',
+  signDisplay: 'always',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 1
+});
+
+function formatKpiValue(kpi: KPI): string {
+  switch (kpi.unit) {
+    case 'currency':
+      return compactCurrencyFormatter.format(kpi.value);
+    case 'percent':
+      return percentValueFormatter.format(kpi.value);
+    default:
+      return integerFormatter.format(kpi.value);
+  }
+}
+
+function formatDelta(delta: number): string {
+  return percentDeltaFormatter.format(delta);
+}
+
+type DisplayKpi = {
+  id: string;
+  label: string;
+  value: string;
+  delta: string;
+  raw: KPI;
+};
 
 export default function App() {
   const [timeframe, setTimeframe] = useState<string>(timeframeOptions[0]?.value ?? 'today');
   const [openId, setOpenId] = useState<string | null>(null);
-  const shouldReduceMotion = useReducedMotion();
+  const [facts, setFacts] = useState<Factset | null>(null);
+  const [highlights, setHighlights] = useState<Record<string, boolean>>({});
+
+  const reduceMotionPreference = useReducedMotion();
+  const shouldReduceMotion = reduceMotionPreference ?? false;
+  const highlightTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const triggerHighlight = useCallback((ids: string[]) => {
+    if (ids.length === 0) {
+      return;
+    }
+
+    setHighlights((current) => {
+      const next = { ...current };
+      ids.forEach((id) => {
+        next[id] = true;
+      });
+      return next;
+    });
+
+    ids.forEach((id) => {
+      const existing = highlightTimers.current[id];
+      if (existing) {
+        clearTimeout(existing);
+      }
+
+      highlightTimers.current[id] = setTimeout(() => {
+        setHighlights((current) => {
+          if (!current[id]) {
+            return current;
+          }
+
+          const next = { ...current };
+          delete next[id];
+          return next;
+        });
+        delete highlightTimers.current[id];
+      }, 2000);
+    });
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const unsubscribe = subscribeFacts((update) => {
+      setFacts((previous) => {
+        if (!previous) {
+          return update;
+        }
+
+        const changedIds = update.kpis.reduce<string[]>((acc, kpi) => {
+          const prior = previous.kpis.find((item) => item.id === kpi.id);
+          if (!prior || prior.value !== kpi.value || prior.delta !== kpi.delta) {
+            acc.push(kpi.id);
+          }
+          return acc;
+        }, []);
+
+        if (changedIds.length > 0) {
+          triggerHighlight(changedIds);
+        }
+
+        return update;
+      });
+    });
+
+    getInitialFacts()
+      .then((initial) => {
+        if (!isMounted) {
+          return;
+        }
+        setFacts((current) => current ?? initial);
+      })
+      .catch((error) => {
+        console.error('[app] Failed to load initial facts', error);
+      });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+      Object.values(highlightTimers.current).forEach((timer) => clearTimeout(timer));
+      highlightTimers.current = {};
+    };
+  }, [triggerHighlight]);
+
+  const displayKpis = useMemo<DisplayKpi[] | undefined>(() => {
+    if (!facts) {
+      return undefined;
+    }
+
+    return facts.kpis.map((kpi) => ({
+      id: kpi.id,
+      label: kpi.label,
+      value: formatKpiValue(kpi),
+      delta: formatDelta(kpi.delta),
+      raw: kpi
+    }));
+  }, [facts]);
 
   const handleTimeframeChange = (value: string) => {
     withViewTransition(() => {
@@ -49,7 +181,10 @@ export default function App() {
     });
   };
 
-  const activeKpi = openId ? kpis.find((kpi) => kpi.id === openId) : undefined;
+  const activeKpi = openId ? displayKpis?.find((kpi) => kpi.id === openId) : undefined;
+  const lastUpdatedLabel = facts
+    ? new Date(facts.generatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' })
+    : null;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -69,9 +204,14 @@ export default function App() {
       <main className="py-12">
         <Container className="space-y-10">
           <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+            <div className="space-y-1">
               <h2 className="text-lg font-semibold text-white">Overview</h2>
               <p className="text-sm text-slate-400">Track activity across the selected timeframe.</p>
+              {lastUpdatedLabel ? (
+                <p className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">
+                  Last updated {lastUpdatedLabel}
+                </p>
+              ) : null}
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
               <div
@@ -107,9 +247,30 @@ export default function App() {
           </section>
           <section>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {kpis.map((kpi) => (
-                <KpiCard key={kpi.id} {...kpi} onOpen={handleOpenDetail} />
-              ))}
+              {displayKpis
+                ? displayKpis.map((kpi) => (
+                    <KpiCard
+                      key={kpi.id}
+                      id={kpi.id}
+                      label={kpi.label}
+                      value={kpi.value}
+                      delta={kpi.delta}
+                      onOpen={handleOpenDetail}
+                      highlighted={Boolean(highlights[kpi.id])}
+                      reduceMotion={shouldReduceMotion}
+                    />
+                  ))
+                : Array.from({ length: 4 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="flex h-full flex-col gap-3 rounded-2xl border border-slate-800/70 bg-slate-900/40 p-6"
+                    >
+                      <div className={cn('h-4 w-24 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
+                      <div className={cn('h-8 w-32 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
+                      <div className={cn('h-4 w-20 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
+                      <div className={cn('mt-auto h-3 w-16 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
+                    </div>
+                  ))}
             </div>
           </section>
           <motion.section
@@ -134,17 +295,35 @@ export default function App() {
             >
               <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
                 <div className="h-72 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-4">
-                  <TrendLine data={trendData} />
+                  {facts ? (
+                    <TrendLine data={facts.trend} />
+                  ) : (
+                    <div className={cn('h-full rounded-xl bg-slate-900/40', !shouldReduceMotion && 'animate-pulse')} />
+                  )}
                 </div>
                 <div className="h-72 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-4">
-                  <BarBreakdown data={categoryBreakdown} />
+                  {facts ? (
+                    <BarBreakdown data={facts.categories} />
+                  ) : (
+                    <div className={cn('h-full rounded-xl bg-slate-900/40', !shouldReduceMotion && 'animate-pulse')} />
+                  )}
                 </div>
               </div>
             </Suspense>
           </motion.section>
         </Container>
       </main>
-      {activeKpi ? <KpiDetail {...activeKpi} onClose={handleCloseDetail} /> : null}
+      {activeKpi && facts ? (
+        <KpiDetail
+          kpi={activeKpi.raw}
+          formattedValue={activeKpi.value}
+          formattedDelta={activeKpi.delta}
+          generatedAt={facts.generatedAt}
+          trend={facts.trend}
+          categories={facts.categories}
+          onClose={handleCloseDetail}
+        />
+      ) : null}
     </div>
   );
 }

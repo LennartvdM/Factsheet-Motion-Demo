@@ -3,20 +3,24 @@ import { createPortal } from 'react-dom';
 
 import { FocusScope } from './FocusScope';
 import { cn } from '../lib/cn';
-import { categoryBreakdown, trendData } from '../lib/chartData';
+import type { CategoryBreakdown, KPI, TrendPoint } from '../types';
 
 const TrendLine = lazy(() => import('./charts/TrendLine'));
 const BarBreakdown = lazy(() => import('./charts/BarBreakdown'));
 
 type KpiDetailProps = {
-  id: string;
-  label: string;
-  value: string;
-  delta: string;
+  kpi: KPI;
+  formattedValue: string;
+  formattedDelta: string;
+  generatedAt: string;
+  trend: TrendPoint[];
+  categories: CategoryBreakdown[];
   onClose: () => void;
 };
 
-export function KpiDetail({ id, label, value, delta, onClose }: KpiDetailProps) {
+export function KpiDetail({ kpi, formattedValue, formattedDelta, generatedAt, trend, categories, onClose }: KpiDetailProps) {
+  const { id, label } = kpi;
+
   useEffect(() => {
     if (typeof document === 'undefined') {
       return;
@@ -64,14 +68,17 @@ export function KpiDetail({ id, label, value, delta, onClose }: KpiDetailProps) 
               <p id={`kpi-${id}-detail-label`} className="text-sm font-medium text-slate-400">
                 {label}
               </p>
-              <p className="text-4xl font-semibold text-white">{value}</p>
+              <p className="text-4xl font-semibold text-white">{formattedValue}</p>
               <p
                 className={cn(
                   'text-sm font-semibold',
-                  delta.trim().startsWith('-') ? 'text-rose-400' : 'text-emerald-400'
+                  formattedDelta.trim().startsWith('-') ? 'text-rose-400' : 'text-emerald-400'
                 )}
               >
-                {delta} vs last period
+                {formattedDelta} vs last period
+              </p>
+              <p className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">
+                Updated {new Date(generatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
               </p>
             </div>
             <p className="text-sm leading-relaxed text-slate-300">
@@ -89,10 +96,10 @@ export function KpiDetail({ id, label, value, delta, onClose }: KpiDetailProps) 
               >
                 <div className="grid gap-4">
                   <div className="h-60 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-3">
-                    <TrendLine data={trendData} />
+                    <TrendLine data={trend} />
                   </div>
                   <div className="h-60 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-3">
-                    <BarBreakdown data={categoryBreakdown} />
+                    <BarBreakdown data={categories} />
                   </div>
                 </div>
               </Suspense>

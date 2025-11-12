@@ -19,6 +19,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "src/global.d.ts", "server/mock-data.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
