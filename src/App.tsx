@@ -1,23 +1,28 @@
-import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 
-import { KpiCard } from './components/KpiCard';
 import { KpiDetail } from './components/KpiDetail';
-import { Button } from './components/ui/Button';
 import { Container } from './components/ui/Container';
+import { Segmented } from './components/ui/Segmented';
 import { VisuallyHidden } from './components/ui/VisuallyHidden';
-import { cn } from './lib/cn';
 import { withViewTransition } from './lib/viewTransition';
 import { getInitialFacts, subscribeFacts } from './data/client';
 import type { Factset, KPI } from './types';
 
-const TrendLine = lazy(() => import('./components/charts/TrendLine'));
-const BarBreakdown = lazy(() => import('./components/charts/BarBreakdown'));
+import { Breakdown } from './sections/Breakdown';
+import { Notes } from './sections/Notes';
+import { Overview } from './sections/Overview';
 
 const timeframeOptions = [
   { label: 'Today', value: 'today' },
   { label: '7d', value: '7d' },
   { label: '30d', value: '30d' }
+];
+
+const tabOptions = [
+  { label: 'Overview', value: 'overview', id: 'tab-overview', controls: 'tab-panel-overview' },
+  { label: 'Breakdown', value: 'breakdown', id: 'tab-breakdown', controls: 'tab-panel-breakdown' },
+  { label: 'Notes', value: 'notes', id: 'tab-notes', controls: 'tab-panel-notes' }
 ];
 
 const integerFormatter = new Intl.NumberFormat('en-US');
@@ -63,6 +68,7 @@ type DisplayKpi = {
 };
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState<string>(tabOptions[0]?.value ?? 'overview');
   const [timeframe, setTimeframe] = useState<string>(timeframeOptions[0]?.value ?? 'today');
   const [openId, setOpenId] = useState<string | null>(null);
   const [facts, setFacts] = useState<Factset | null>(null);
@@ -163,6 +169,12 @@ export default function App() {
     }));
   }, [facts]);
 
+  const handleTabChange = (value: string) => {
+    withViewTransition(() => {
+      setActiveTab(value);
+    });
+  };
+
   const handleTimeframeChange = (value: string) => {
     withViewTransition(() => {
       setTimeframe(value);
@@ -186,6 +198,46 @@ export default function App() {
     ? new Date(facts.generatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' })
     : null;
 
+  const tabPanel = (() => {
+    switch (activeTab) {
+      case 'breakdown':
+        return (
+          <Breakdown
+            timeframe={timeframe}
+            timeframeOptions={timeframeOptions}
+            onTimeframeChange={handleTimeframeChange}
+            shouldReduceMotion={shouldReduceMotion}
+            facts={facts}
+          />
+        );
+      case 'notes':
+        return (
+          <Notes
+            timeframe={timeframe}
+            timeframeOptions={timeframeOptions}
+            onTimeframeChange={handleTimeframeChange}
+            shouldReduceMotion={shouldReduceMotion}
+            facts={facts}
+          />
+        );
+      case 'overview':
+      default:
+        return (
+          <Overview
+            timeframe={timeframe}
+            timeframeOptions={timeframeOptions}
+            onTimeframeChange={handleTimeframeChange}
+            lastUpdatedLabel={lastUpdatedLabel}
+            displayKpis={displayKpis}
+            highlights={highlights}
+            onOpenDetail={handleOpenDetail}
+            shouldReduceMotion={shouldReduceMotion}
+            facts={facts}
+          />
+        );
+    }
+  })();
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <header className="border-b border-slate-900/70 bg-slate-950/80 backdrop-blur">
@@ -203,114 +255,36 @@ export default function App() {
       </header>
       <main className="py-12">
         <Container className="space-y-10">
-          <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1">
-              <h2 className="text-lg font-semibold text-white">Overview</h2>
-              <p className="text-sm text-slate-400">Track activity across the selected timeframe.</p>
-              {lastUpdatedLabel ? (
-                <p className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">
-                  Last updated {lastUpdatedLabel}
-                </p>
-              ) : null}
+          <div className="flex flex-col gap-3">
+            <VisuallyHidden id="section-tabs-label">Select dashboard section</VisuallyHidden>
+            <Segmented
+              type="tab"
+              options={tabOptions}
+              value={activeTab}
+              onValueChange={handleTabChange}
+              ariaLabelledBy="section-tabs-label"
+            />
+          </div>
+          {shouldReduceMotion ? (
+            <div id={`tab-panel-${activeTab}`} role="tabpanel" aria-labelledby={`tab-${activeTab}`}>
+              {tabPanel}
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-              <div
-                role="group"
-                aria-labelledby="timeframe-label"
-                className="inline-flex items-center gap-1 rounded-2xl border border-slate-800/80 bg-slate-900/60 p-1 shadow-inner shadow-slate-900/40"
+          ) : (
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={activeTab}
+                id={`tab-panel-${activeTab}`}
+                role="tabpanel"
+                aria-labelledby={`tab-${activeTab}`}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -24 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
               >
-                <VisuallyHidden id="timeframe-label">Select timeframe</VisuallyHidden>
-                {timeframeOptions.map((option) => {
-                  const isActive = option.value === timeframe;
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      aria-pressed={isActive}
-                      onClick={() => handleTimeframeChange(option.value)}
-                      className={cn(
-                        'relative rounded-xl px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
-                        isActive
-                          ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/20'
-                          : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
-                      )}
-                    >
-                      {option.label}
-                    </button>
-                  );
-                })}
-              </div>
-              <Button variant="ghost" className="sm:w-auto">
-                Export
-              </Button>
-            </div>
-          </section>
-          <section>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {displayKpis
-                ? displayKpis.map((kpi) => (
-                    <KpiCard
-                      key={kpi.id}
-                      id={kpi.id}
-                      label={kpi.label}
-                      value={kpi.value}
-                      delta={kpi.delta}
-                      onOpen={handleOpenDetail}
-                      highlighted={Boolean(highlights[kpi.id])}
-                      reduceMotion={shouldReduceMotion}
-                    />
-                  ))
-                : Array.from({ length: 4 }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="flex h-full flex-col gap-3 rounded-2xl border border-slate-800/70 bg-slate-900/40 p-6"
-                    >
-                      <div className={cn('h-4 w-24 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
-                      <div className={cn('h-8 w-32 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
-                      <div className={cn('h-4 w-20 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
-                      <div className={cn('mt-auto h-3 w-16 rounded-full bg-slate-800/70', !shouldReduceMotion && 'animate-pulse')} />
-                    </div>
-                  ))}
-            </div>
-          </section>
-          <motion.section
-            className="overflow-hidden rounded-3xl border border-slate-800/80 bg-slate-900/60 p-6 shadow-2xl shadow-slate-950/40"
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
-            animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-            transition={shouldReduceMotion ? undefined : { duration: 0.5, ease: 'easeOut' }}
-          >
-            <div className="flex flex-col gap-2 pb-4">
-              <p className="text-sm font-medium uppercase tracking-[0.2em] text-sky-400">Trends</p>
-              <h2 className="text-2xl font-semibold text-white">Performance over time</h2>
-              <p className="text-sm text-slate-400">
-                Explore how engagement evolves across the network and where regional momentum is accelerating.
-              </p>
-            </div>
-            <Suspense
-              fallback={
-                <div className="flex h-[32rem] items-center justify-center rounded-2xl border border-slate-800/60 bg-slate-900/40 text-sm text-slate-400">
-                  Loading trend insights…
-                </div>
-              }
-            >
-              <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
-                <div className="h-72 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-4">
-                  {facts ? (
-                    <TrendLine data={facts.trend} />
-                  ) : (
-                    <div className={cn('h-full rounded-xl bg-slate-900/40', !shouldReduceMotion && 'animate-pulse')} />
-                  )}
-                </div>
-                <div className="h-72 overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-900/60 p-4">
-                  {facts ? (
-                    <BarBreakdown data={facts.categories} />
-                  ) : (
-                    <div className={cn('h-full rounded-xl bg-slate-900/40', !shouldReduceMotion && 'animate-pulse')} />
-                  )}
-                </div>
-              </div>
-            </Suspense>
-          </motion.section>
+                {tabPanel}
+              </motion.div>
+            </AnimatePresence>
+          )}
         </Container>
       </main>
       {activeKpi && facts ? (
