@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Factsheet Motion Demo - Root Tabs</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="header">
+      <nav class="root-tabs" aria-label="Primary">
+        <button class="root-tab root-tab--active" type="button" data-root-tab="visuals">Visuals</button>
+        <button class="root-tab" type="button" data-root-tab="config">Config</button>
+        <button class="root-tab" type="button" data-root-tab="console">Console</button>
+        <button class="root-tab" type="button" data-root-tab="json">JSON</button>
+        <button class="root-tab" type="button" data-root-tab="fixtures">Fixtures</button>
+        <button class="root-tab" type="button" data-root-tab="logs">Logs</button>
+      </nav>
+    </header>
+
+    <main class="root-panels">
+      <section class="root-panel" data-root-panel="visuals">
+        <h1>Visuals</h1>
+        <p>This panel showcases the visual representation of the current factsheet.</p>
+      </section>
+      <section class="root-panel is-hidden" data-root-panel="config">
+        <h1>Config</h1>
+        <p>Update configuration options for the motion demo here.</p>
+      </section>
+      <section class="root-panel is-hidden" data-root-panel="console">
+        <h1>Console</h1>
+        <p>Console output and debugging tools appear in this space.</p>
+      </section>
+      <section class="root-panel is-hidden" data-root-panel="json">
+        <h1>JSON</h1>
+        <p>Inspect the raw JSON backing the current visualisation.</p>
+      </section>
+      <section class="root-panel is-hidden" data-root-panel="fixtures">
+        <h1>Fixtures</h1>
+        <p>Load and manage fixture data for testing scenarios.</p>
+      </section>
+      <section class="root-panel is-hidden" data-root-panel="logs">
+        <h1>Logs</h1>
+        <p>System and application logs will be displayed here.</p>
+      </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
