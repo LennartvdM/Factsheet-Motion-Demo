@@ -4,6 +4,7 @@ type FocusScopeProps = {
   children: ReactNode;
   onClose?: () => void;
   initialFocusRef?: RefObject<HTMLElement | null>;
+  className?: string;
 };
 
 const FOCUSABLE_SELECTORS = [
@@ -24,7 +25,7 @@ const getFocusableElements = (container: HTMLElement) => {
   );
 };
 
-export function FocusScope({ children, onClose, initialFocusRef }: FocusScopeProps) {
+export function FocusScope({ children, onClose, initialFocusRef, className }: FocusScopeProps) {
   const scopeRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
 
@@ -110,7 +111,7 @@ export function FocusScope({ children, onClose, initialFocusRef }: FocusScopePro
   }, [initialFocusRef, onClose]);
 
   return (
-    <div ref={scopeRef} tabIndex={-1}>
+    <div ref={scopeRef} tabIndex={-1} className={className}>
       {children}
     </div>
   );

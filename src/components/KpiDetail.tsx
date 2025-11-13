@@ -1,8 +1,9 @@
-import { Suspense, lazy, type MouseEvent, useEffect, useRef } from 'react';
+import { Suspense, lazy, type MouseEvent, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 import { FocusScope } from './FocusScope';
 import { cn } from '../lib/cn';
+import { useLockBodyScroll } from '../hooks/useLockBodyScroll';
 import type { CategoryBreakdown, KPI, TrendPoint } from '../types';
 
 const TrendLine = lazy(() => import('./charts/TrendLine'));
@@ -22,19 +23,7 @@ export function KpiDetail({ kpi, formattedValue, formattedDelta, generatedAt, tr
   const { id, label } = kpi;
   const headingRef = useRef<HTMLHeadingElement>(null);
 
-  useEffect(() => {
-    if (typeof document === 'undefined') {
-      return;
-    }
-
-    const { body } = document;
-    const previousOverflow = body.style.overflow;
-    body.style.overflow = 'hidden';
-
-    return () => {
-      body.style.overflow = previousOverflow;
-    };
-  }, []);
+  useLockBodyScroll(true);
 
   const handleOverlayClick = (event: MouseEvent<HTMLDivElement>) => {
     if (event.target === event.currentTarget) {
@@ -44,27 +33,30 @@ export function KpiDetail({ kpi, formattedValue, formattedDelta, generatedAt, tr
 
   const content = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(var(--color-overlay),0.75)] p-4 backdrop-blur"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-[rgba(var(--color-overlay),0.75)] p-4 backdrop-blur sm:items-center"
       onClick={handleOverlayClick}
     >
-      <FocusScope onClose={onClose} initialFocusRef={headingRef}>
+      <FocusScope onClose={onClose} initialFocusRef={headingRef} className="flex w-full justify-center">
         <div
           role="dialog"
           aria-modal="true"
           aria-labelledby={`kpi-${id}-detail-label`}
           className={cn(
-            'relative w-full max-w-lg rounded-3xl border border-strong bg-[rgba(var(--color-card),0.95)] p-8 text-[rgb(var(--color-text))] shadow-2xl shadow-[rgba(var(--color-overlay),0.35)] transition-colors'
+            'relative flex w-full max-w-lg flex-col rounded-3xl border border-strong bg-[rgba(var(--color-card),0.95)] text-[rgb(var(--color-text))] shadow-2xl shadow-[rgba(var(--color-overlay),0.35)] transition-colors',
+            'max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-h-[calc(100vh-4rem)]'
           )}
-          style={{ viewTransitionName: `kpi-${id}` }}
+          style={{ viewTransitionName: `kpi-${id}`, WebkitOverflowScrolling: 'touch' }}
         >
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute right-4 top-4 rounded-full bg-[rgba(var(--color-surface-muted),0.85)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted transition hover:bg-[rgba(var(--color-surface-muted),1)] hover:text-[rgb(var(--color-text))] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-card))]"
-          >
-            Close
-          </button>
-          <div className="space-y-4">
+          <div className="sticky top-0 z-10 flex justify-end border-b border-soft bg-[rgba(var(--color-card),0.98)] px-8 py-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-full bg-[rgba(var(--color-surface-muted),0.85)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted transition hover:bg-[rgba(var(--color-surface-muted),1)] hover:text-[rgb(var(--color-text))] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-card))]"
+            >
+              Close
+            </button>
+          </div>
+          <div className="space-y-4 px-8 pb-8 pt-6">
             <div className="space-y-1">
               <h2
                 id={`kpi-${id}-detail-label`}

@@ -1,6 +1,5 @@
 import {
   useCallback,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -16,6 +15,7 @@ import { Container } from '../components/ui/Container';
 import type { ChartFigure } from '../types/ChartFigure';
 import { allFigures } from '../data/figures';
 import { createTextLayers } from '../utils/textFold';
+import { useLockBodyScroll } from '../hooks/useLockBodyScroll';
 
 const overlaySpring = {
   type: 'spring',
@@ -40,20 +40,6 @@ export function FactsheetDemo() {
   }, []);
 
   const [selectedFigure, setSelectedFigure] = useState<ChartFigure | null>(null);
-
-  useEffect(() => {
-    if (!selectedFigure || typeof document === 'undefined') {
-      return;
-    }
-
-    const { body } = document;
-    const previousOverflow = body.style.overflow;
-    body.style.overflow = 'hidden';
-
-    return () => {
-      body.style.overflow = previousOverflow;
-    };
-  }, [selectedFigure]);
 
   const openPanel = useCallback((fig: ChartFigure) => {
     setSelectedFigure(fig);
@@ -100,6 +86,8 @@ function PanelOverlay({ figure, onClose }: { figure: ChartFigure | null; onClose
   const headingRef = useRef<HTMLHeadingElement>(null);
   const textLayers = useMemo(() => (figure ? createTextLayers(figure) : null), [figure]);
 
+  useLockBodyScroll(Boolean(figure));
+
   const handleOverlayClick = useCallback(
     (event: ReactMouseEvent<HTMLDivElement>) => {
       if (event.target === event.currentTarget) {
@@ -118,49 +106,54 @@ function PanelOverlay({ figure, onClose }: { figure: ChartFigure | null; onClose
       transition={{ duration: 0.2 }}
       onClick={handleOverlayClick}
     >
-      <FocusScope onClose={onClose} initialFocusRef={headingRef}>
+      <FocusScope onClose={onClose} initialFocusRef={headingRef} className="flex h-full w-full justify-end">
         <motion.aside
           key={figure.id}
           role="dialog"
           aria-modal="true"
           aria-labelledby="factsheet-panel-title"
-          className="relative flex h-full w-full max-w-xl flex-col gap-6 overflow-y-auto border-l border-soft bg-[rgba(var(--color-card),0.97)] p-10 text-left text-[rgb(var(--color-text))] shadow-2xl"
+          className="relative flex h-full w-full max-w-xl flex-col overflow-hidden border-l border-soft bg-[rgba(var(--color-card),0.97)] text-left text-[rgb(var(--color-text))] shadow-2xl"
           initial={{ x: '100%' }}
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
           transition={overlaySpring}
         >
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute right-8 top-6 rounded-full bg-[rgba(var(--color-surface-muted),0.85)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted transition hover:bg-[rgba(var(--color-surface-muted),1)] hover:text-[rgb(var(--color-text))] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-card))]"
-          >
-            Close
-          </button>
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted">
-                {figure.label}
-              </p>
-              <h2
-                id="factsheet-panel-title"
-                ref={headingRef}
-                tabIndex={-1}
-                className="text-3xl font-semibold"
-              >
-                {textLayers?.headline ?? figure.title ?? figure.label}
-              </h2>
-            </div>
-            {textLayers ? (
-              <div className="space-y-4 text-base leading-relaxed text-muted">
-                {textLayers.narrative.map((paragraph, index) => (
-                  <p key={index}>{paragraph}</p>
-                ))}
+          <div className="flex-1 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="sticky top-0 z-10 border-b border-soft bg-[rgba(var(--color-card),0.97)] px-10 pb-5 pt-8">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted">
+                    {figure.label}
+                  </p>
+                  <h2
+                    id="factsheet-panel-title"
+                    ref={headingRef}
+                    tabIndex={-1}
+                    className="text-3xl font-semibold"
+                  >
+                    {textLayers?.headline ?? figure.title ?? figure.label}
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="self-start rounded-full bg-[rgba(var(--color-surface-muted),0.85)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted transition hover:bg-[rgba(var(--color-surface-muted),1)] hover:text-[rgb(var(--color-text))] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-card))]"
+                >
+                  Close
+                </button>
               </div>
-            ) : null}
-            <div className="rounded-3xl border border-soft bg-[rgba(var(--color-card),0.85)] p-4">
-              <FigureChart fig={figure} />
+            </div>
+            <div className="space-y-4 px-10 pb-10 pt-6">
+              {textLayers ? (
+                <div className="space-y-4 text-base leading-relaxed text-muted">
+                  {textLayers.narrative.map((paragraph, index) => (
+                    <p key={index}>{paragraph}</p>
+                  ))}
+                </div>
+              ) : null}
+              <div className="rounded-3xl border border-soft bg-[rgba(var(--color-card),0.85)] p-4">
+                <FigureChart fig={figure} />
+              </div>
             </div>
           </div>
         </motion.aside>
