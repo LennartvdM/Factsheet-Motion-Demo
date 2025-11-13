@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react';
+import { useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
 import { FocusScope } from './FocusScope';
@@ -7,6 +7,7 @@ import { Button } from './ui/Button';
 import { Card } from './ui/Card';
 import type { ChartFigure } from '../types/ChartFigure';
 import { createTextLayers } from '../utils/textFold';
+import { useLockBodyScroll } from '../hooks/useLockBodyScroll';
 
 interface FigureCardProps {
   fig: ChartFigure;
@@ -22,19 +23,7 @@ export function FigureCard({ fig, onOpen, onClose, showOverlay = true }: FigureC
   const cardId = `figure-${fig.id ?? fig.label.replace(/\s+/g, '-').toLowerCase()}`;
   const shouldManageOverlay = showOverlay !== false;
 
-  useEffect(() => {
-    if (!shouldManageOverlay || !isOpen || typeof document === 'undefined') {
-      return;
-    }
-
-    const { body } = document;
-    const previousOverflow = body.style.overflow;
-    body.style.overflow = 'hidden';
-
-    return () => {
-      body.style.overflow = previousOverflow;
-    };
-  }, [isOpen, shouldManageOverlay]);
+  useLockBodyScroll(shouldManageOverlay && isOpen);
 
   const handleOpen = () => {
     if (shouldManageOverlay) {
@@ -58,44 +47,48 @@ export function FigureCard({ fig, onOpen, onClose, showOverlay = true }: FigureC
 
   const overlayContent = shouldManageOverlay && isOpen ? (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(var(--color-overlay),0.75)] p-4 backdrop-blur"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-[rgba(var(--color-overlay),0.75)] p-4 backdrop-blur sm:items-center"
       onClick={handleOverlayClick}
     >
-      <FocusScope onClose={handleClose} initialFocusRef={headingRef}>
+      <FocusScope onClose={handleClose} initialFocusRef={headingRef} className="flex w-full justify-center">
         <div
           role="dialog"
           aria-modal="true"
           aria-labelledby={`${cardId}-dialog-label ${cardId}-dialog-title`}
-          className="relative w-full max-w-3xl space-y-6 rounded-3xl border border-strong bg-[rgba(var(--color-card),0.95)] p-8 text-[rgb(var(--color-text))] shadow-2xl shadow-[rgba(var(--color-overlay),0.35)]"
+          className="relative flex w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-strong bg-[rgba(var(--color-card),0.95)] text-[rgb(var(--color-text))] shadow-2xl shadow-[rgba(var(--color-overlay),0.35)] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)]"
         >
-          <button
-            type="button"
-            onClick={handleClose}
-            className="absolute right-5 top-5 rounded-full bg-[rgba(var(--color-surface-muted),0.85)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted transition hover:bg-[rgba(var(--color-surface-muted),1)] hover:text-[rgb(var(--color-text))] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-card))]"
-          >
-            Close
-          </button>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted" id={`${cardId}-dialog-label`}>
-                {fig.label}
-              </p>
-              <h2
-                id={`${cardId}-dialog-title`}
-                ref={headingRef}
-                tabIndex={-1}
-                className="text-4xl font-semibold"
+          <div className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-h-[calc(100vh-4rem)]" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="sticky top-0 z-10 flex justify-end border-b border-soft bg-[rgba(var(--color-card),0.98)] px-8 py-5">
+              <button
+                type="button"
+                onClick={handleClose}
+                className="rounded-full bg-[rgba(var(--color-surface-muted),0.85)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted transition hover:bg-[rgba(var(--color-surface-muted),1)] hover:text-[rgb(var(--color-text))] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-card))]"
               >
-                {textLayers.headline}
-              </h2>
+                Close
+              </button>
             </div>
-            <div className="space-y-3 text-base leading-relaxed text-muted">
-              {textLayers.narrative.map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
-              ))}
-            </div>
-            <div className="rounded-3xl border border-soft bg-[rgba(var(--color-card),0.85)] p-4">
-              <FigureChart fig={fig} />
+            <div className="space-y-4 px-8 pb-8 pt-6">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted" id={`${cardId}-dialog-label`}>
+                  {fig.label}
+                </p>
+                <h2
+                  id={`${cardId}-dialog-title`}
+                  ref={headingRef}
+                  tabIndex={-1}
+                  className="text-4xl font-semibold"
+                >
+                  {textLayers.headline}
+                </h2>
+              </div>
+              <div className="space-y-3 text-base leading-relaxed text-muted">
+                {textLayers.narrative.map((paragraph, index) => (
+                  <p key={index}>{paragraph}</p>
+                ))}
+              </div>
+              <div className="rounded-3xl border border-soft bg-[rgba(var(--color-card),0.85)] p-4">
+                <FigureChart fig={fig} />
+              </div>
             </div>
           </div>
         </div>
