@@ -50,7 +50,7 @@ export function FactsheetDemo() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--color-surface))] py-16">
+    <div className="min-h-screen bg-[rgb(var(--color-bg))] py-16 text-[rgb(var(--color-text))] transition-colors">
       <Container className="space-y-12">
         <header className="space-y-3 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.4em] text-muted">

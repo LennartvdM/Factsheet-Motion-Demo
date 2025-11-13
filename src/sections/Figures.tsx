@@ -65,7 +65,7 @@ export function Figures({ shouldReduceMotion = false }: FiguresSectionProps) {
         </p>
       </header>
 
-      <div className="space-y-8 rounded-3xl border border-soft bg-[rgba(var(--color-surface),0.65)] p-6">
+      <div className="space-y-8 rounded-3xl border border-soft bg-[rgba(var(--color-card),0.65)] p-6">
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {figures.map((figure) => (
             <FigureCard key={figure.id} fig={figure} showOverlay={false} onOpen={openPanel} />
