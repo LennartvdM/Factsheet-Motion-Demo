@@ -11,6 +11,8 @@ import { getInitialFacts, subscribeFacts } from './data/client';
 import { ThemeProvider } from './theme/ThemeProvider';
 import type { Factset, KPI } from './types';
 
+import { FigureChart } from './components/FigureChart';
+import { figuresById } from './data/figures';
 import { Breakdown } from './sections/Breakdown';
 import { Notes } from './sections/Notes';
 import { Overview } from './sections/Overview';
@@ -281,6 +283,8 @@ export default function App() {
     }
   })();
 
+  const smokeTestFigure = figuresById['fig1'];
+
   return (
     <ThemeProvider>
       <div
@@ -341,6 +345,18 @@ export default function App() {
               </AnimatePresence>
             )}
           </Container>
+          {smokeTestFigure ? (
+            <Container className="py-12">
+              <section className="rounded-2xl border border-soft bg-[rgba(var(--color-surface),0.65)] p-6">
+                <h2 className="text-sm font-semibold uppercase tracking-[0.3em] text-subtle">
+                  Figure Smoke Test
+                </h2>
+                <div className="mt-6">
+                  <FigureChart fig={smokeTestFigure} />
+                </div>
+              </section>
+            </Container>
+          ) : null}
         </main>
         {activeKpi && facts ? (
           <KpiDetail
