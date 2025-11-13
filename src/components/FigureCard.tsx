@@ -85,7 +85,7 @@ export function FigureCard({ fig, onOpen, onClose, showOverlay = true }: FigureC
             {textLayers.headline}
           </motion.p>
           <p className="text-sm leading-relaxed text-subtle transition-colors group-hover:text-muted">
-            {textLayers.overlay}
+            {textLayers.summary}
           </p>
         </div>
         <motion.div layout className="flex flex-1 items-center justify-center overflow-hidden rounded-2xl border border-soft bg-[rgba(var(--color-card),0.6)] p-4">
@@ -140,8 +140,9 @@ export function FigureCard({ fig, onOpen, onClose, showOverlay = true }: FigureC
                       <p className="text-4xl font-semibold">{textLayers.headline}</p>
                     </div>
                     <div className="space-y-3 text-base leading-relaxed text-muted">
-                      <p>{textLayers.overlay}</p>
-                      <p>{textLayers.paragraph}</p>
+                      {textLayers.narrative.map((paragraph, index) => (
+                        <p key={index}>{paragraph}</p>
+                      ))}
                     </div>
                     <div className="rounded-3xl border border-soft bg-[rgba(var(--color-card),0.85)] p-4">
                       <FigureChart fig={fig} />

@@ -154,8 +154,9 @@ function PanelOverlay({ figure, onClose }: { figure: ChartFigure | null; onClose
             </div>
             {textLayers ? (
               <div className="space-y-4 text-base leading-relaxed text-muted">
-                <p>{textLayers.overlay}</p>
-                <p>{textLayers.paragraph}</p>
+                {textLayers.narrative.map((paragraph, index) => (
+                  <p key={index}>{paragraph}</p>
+                ))}
               </div>
             ) : null}
             <div className="rounded-3xl border border-soft bg-[rgba(var(--color-card),0.85)] p-4">
