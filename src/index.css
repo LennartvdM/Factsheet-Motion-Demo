@@ -8,6 +8,7 @@
 
   --color-bg: 248 250 252;
   --color-card: 255 255 255;
+  --color-surface: var(--color-card);
   --color-surface-muted: 241 245 249;
   --color-text: 15 23 42;
   --color-text-muted: 71 85 105;
@@ -24,6 +25,7 @@
 
   --color-bg: 15 23 42;
   --color-card: 30 41 59;
+  --color-surface: var(--color-card);
   --color-surface-muted: 15 23 42;
   --color-text: 226 232 240;
   --color-text-muted: 203 213 225;
@@ -40,6 +42,7 @@
 
   --color-bg: 240 249 255;
   --color-card: 224 242 254;
+  --color-surface: var(--color-card);
   --color-surface-muted: 219 234 254;
   --color-text: 3 7 18;
   --color-text-muted: 15 23 42;
@@ -56,6 +59,7 @@
 
   --color-bg: 255 247 237;
   --color-card: 254 226 226;
+  --color-surface: var(--color-card);
   --color-surface-muted: 255 237 213;
   --color-text: 41 37 36;
   --color-text-muted: 87 83 78;
