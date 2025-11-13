@@ -11,9 +11,8 @@ import { getInitialFacts, subscribeFacts } from './data/client';
 import { ThemeProvider } from './theme/ThemeProvider';
 import type { Factset, KPI } from './types';
 
-import { FigureChart } from './components/FigureChart';
-import { figuresById } from './data/figures';
 import { Breakdown } from './sections/Breakdown';
+import { Figures } from './sections/Figures';
 import { Notes } from './sections/Notes';
 import { Overview } from './sections/Overview';
 
@@ -26,6 +25,7 @@ const timeframeOptions = [
 const tabOptions = [
   { label: 'Overview', value: 'overview', id: 'tab-overview', controls: 'tab-panel-overview' },
   { label: 'Breakdown', value: 'breakdown', id: 'tab-breakdown', controls: 'tab-panel-breakdown' },
+  { label: 'Figures', value: 'figures', id: 'tab-figures', controls: 'tab-panel-figures' },
   { label: 'Notes', value: 'notes', id: 'tab-notes', controls: 'tab-panel-notes' }
 ];
 
@@ -255,6 +255,8 @@ export default function App() {
             facts={facts}
           />
         );
+      case 'figures':
+        return <Figures shouldReduceMotion={shouldReduceMotion} />;
       case 'notes':
         return (
           <Notes
@@ -282,8 +284,6 @@ export default function App() {
         );
     }
   })();
-
-  const smokeTestFigure = figuresById['fig1'];
 
   return (
     <ThemeProvider>
@@ -345,18 +345,6 @@ export default function App() {
               </AnimatePresence>
             )}
           </Container>
-          {smokeTestFigure ? (
-            <Container className="py-12">
-              <section className="rounded-2xl border border-soft bg-[rgba(var(--color-surface),0.65)] p-6">
-                <h2 className="text-sm font-semibold uppercase tracking-[0.3em] text-subtle">
-                  Figure Smoke Test
-                </h2>
-                <div className="mt-6">
-                  <FigureChart fig={smokeTestFigure} />
-                </div>
-              </section>
-            </Container>
-          ) : null}
         </main>
         {activeKpi && facts ? (
           <KpiDetail
