@@ -1,55 +1,78 @@
-import fig1 from '../../figures_chart/fig1.json';
-import fig2 from '../../figures_chart/fig2.json';
-import fig3 from '../../figures_chart/fig3.json';
-import fig4 from '../../figures_chart/fig4.json';
-import fig5 from '../../figures_chart/fig5.json';
-import fig6 from '../../figures_chart/fig6.json';
-import fig7 from '../../figures_chart/fig7.json';
-import fig8 from '../../figures_chart/fig8.json';
-import fig9 from '../../figures_chart/fig9.json';
-import fig10 from '../../figures_chart/fig10.json';
-import fig11 from '../../figures_chart/fig11.json';
-import fig12 from '../../figures_chart/fig12.json';
-import fig19 from '../../figures_chart/fig19.json';
-import fig20 from '../../figures_chart/fig20.json';
-import fig21 from '../../figures_chart/fig21.json';
-import fig22 from '../../figures_chart/fig22.json';
-import fig23 from '../../figures_chart/fig23.json';
-import fig24 from '../../figures_chart/fig24.json';
-
 import type { ChartFigure } from '../types/ChartFigure';
 
-const rawFigures = {
-  fig1,
-  fig2,
-  fig3,
-  fig4,
-  fig5,
-  fig6,
-  fig7,
-  fig8,
-  fig9,
-  fig10,
-  fig11,
-  fig12,
-  fig19,
-  fig20,
-  fig21,
-  fig22,
-  fig23,
-  fig24,
-} as const;
+type RawFigure = {
+  id: string;
+  label: string;
+  title: string | null;
+  indexField: ChartFigure['indexField'];
+  rows: Array<Record<string, unknown>>;
+};
 
-export const Figures: Record<string, ChartFigure> = Object.fromEntries(
-  Object.entries(rawFigures).map(([key, value]) => [key, value as ChartFigure]),
-);
+const rawFigureModules = import.meta.glob<RawFigure>('../../figures_chart/*.json', {
+  eager: true,
+  import: 'default',
+});
 
-export function getFigure(id: string): ChartFigure {
-  const figure = Figures[id];
-
-  if (!figure) {
-    throw new Error(`Unknown figure: ${id}`);
+function normalizeValue(value: unknown): string | number | null {
+  if (value == null) {
+    return null;
   }
 
-  return figure;
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null;
+  }
+
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return '';
+  }
+
+  const dashNormalized = trimmed.replace(/\s+/g, ' ');
+  if (dashNormalized === '--' || dashNormalized === '- -') {
+    return null;
+  }
+
+  const normalizedNumericString = trimmed.replace(',', '.');
+  const normalizedNumeric = Number(normalizedNumericString);
+  if (!Number.isNaN(normalizedNumeric) && /^[-+]?\d*(?:\.\d+)?$/.test(normalizedNumericString)) {
+    return normalizedNumeric;
+  }
+
+  return trimmed;
 }
+
+function normalizeRow(row: Record<string, unknown>): Record<string, string | number | null> {
+  return Object.fromEntries(
+    Object.entries(row).map(([key, value]) => [key, normalizeValue(value)]),
+  );
+}
+
+function toChartFigure(raw: RawFigure): ChartFigure {
+  return {
+    id: raw.id,
+    label: raw.label,
+    title: raw.title ?? null,
+    indexField: raw.indexField,
+    rows: raw.rows.map((row) => normalizeRow(row)),
+  };
+}
+
+const loadedFigures = Object.values(rawFigureModules)
+  .map((raw) => toChartFigure(raw))
+  .sort((left, right) => left.id.localeCompare(right.id, undefined, { numeric: true }));
+
+export const figuresById: Record<string, ChartFigure> = Object.fromEntries(
+  loadedFigures.map((figure) => [figure.id, figure]),
+);
+
+export const allFigures: ChartFigure[] = [...loadedFigures];
+
+export function getFigure(id: string): ChartFigure | undefined {
+  return figuresById[id];
+}
+
