@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 type Factset = import('./types').Factset;
 
 declare module '../../server/mock-data' {

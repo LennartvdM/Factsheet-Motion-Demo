@@ -14,7 +14,7 @@ import { FocusScope } from '../components/FocusScope';
 import { FigureChart } from '../components/FigureChart';
 import { Container } from '../components/ui/Container';
 import type { ChartFigure } from '../types/ChartFigure';
-import { Figures } from '../data/figures';
+import { allFigures } from '../data/figures';
 import { createTextLayers } from '../utils/textFold';
 
 const overlaySpring = {
@@ -25,7 +25,7 @@ const overlaySpring = {
 
 export function FactsheetDemo() {
   const figures = useMemo(() => {
-    return Object.values(Figures)
+    return [...allFigures]
       .sort((left, right) => {
         const leftIndex = parseInt(left.id.replace(/[^0-9]/g, ''), 10);
         const rightIndex = parseInt(right.id.replace(/[^0-9]/g, ''), 10);
