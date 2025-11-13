@@ -1,3 +1,5 @@
+https://factsheetdemo.netlify.app/
+
 # Factsheet Motion Demo
 
 A Vite + React dashboard that showcases motion design patterns for live KPI monitoring. The app streams mock data over Server-Sent Events (SSE), highlights refreshed metrics, and layers View Transition API effects with Framer Motion timelines that respect accessibility preferences.
