@@ -1,0 +1,26 @@
+{
+  "id": "fig7",
+  "label": "Figuur 7",
+  "title": "Gemiddeld niveau beleid charterorganisaties eerder dan 2019 gestart versus nieuwe charterorganisaties vanaf 2019. ",
+  "indexField": "year",
+  "rows": [
+    {
+      "rvb": 0.35985,
+      "rvc": 0.39485,
+      "rvt": 0.45397,
+      "year": 2023
+    },
+    {
+      "rvb": 0.33013,
+      "rvc": 0.43357,
+      "rvt": 0.46202,
+      "year": 2024
+    },
+    {
+      "rvb": -0.029720000000000024,
+      "rvc": 0.03872000000000003,
+      "rvt": 0.008050000000000002,
+      "year": null
+    }
+  ]
+}

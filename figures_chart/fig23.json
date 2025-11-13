@@ -1,0 +1,53 @@
+{
+  "id": "fig23",
+  "label": "Figuur 23",
+  "title": null,
+  "indexField": "year",
+  "rows": [
+    {
+      "leiderschap": 3.2,
+      "strategie  management": 2.5,
+      "HR": 2.9,
+      "Communicatie": 2.5,
+      "Kennis": 2.5,
+      "Klimaat": 2.7,
+      "year": 2020
+    },
+    {
+      "leiderschap": 3.2,
+      "strategie  management": 2.6,
+      "HR": 2.9,
+      "Communicatie": 2.6,
+      "Kennis": 2.6,
+      "Klimaat": 2.9,
+      "year": 2021
+    },
+    {
+      "leiderschap": 3.2,
+      "strategie  management": 2.8,
+      "HR": 3,
+      "Communicatie": 2.7,
+      "Kennis": 2.7,
+      "Klimaat": 2.9,
+      "year": 2022
+    },
+    {
+      "leiderschap": 3.4,
+      "strategie  management": 2.8,
+      "HR": 3.1,
+      "Communicatie": 2.8,
+      "Kennis": 2.8,
+      "Klimaat": 3,
+      "year": 2023
+    },
+    {
+      "leiderschap": 3.3,
+      "strategie  management": 2.8,
+      "HR": 3.1,
+      "Communicatie": 2.8,
+      "Kennis": 2.8,
+      "Klimaat": 3,
+      "year": 2024
+    }
+  ]
+}

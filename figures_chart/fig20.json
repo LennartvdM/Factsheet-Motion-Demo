@@ -1,0 +1,17 @@
+{
+  "id": "fig20",
+  "label": "Figuur 20",
+  "title": null,
+  "indexField": "index",
+  "rows": [
+    {
+      "Leiderschap": 3.4,
+      "Strategie en Management": 3,
+      "HR management": 3.3,
+      "Communicatie": 3.1,
+      "Kennis en Vaardigheden": 3.1,
+      "Klimaat": 3.2,
+      "index": "Mean"
+    }
+  ]
+}

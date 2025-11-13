@@ -1,0 +1,26 @@
+{
+  "id": "fig9",
+  "label": "Figuur 9",
+  "title": "Gemiddelde realisatie op dimensies van m/v-diversiteit en inclusiviteit",
+  "indexField": "index",
+  "rows": [
+    {
+      "rvb": 0.941,
+      "rvc": 0.941,
+      "rvt": 0.889,
+      "index": "bewust beleid om zetels evenwichtig te verdelen"
+    },
+    {
+      "rvb": 0.706,
+      "rvc": 0.706,
+      "rvt": 0.444,
+      "index": "bewust beleid % vrouwen in mgt posities te vergroten"
+    },
+    {
+      "rvb": 0.059,
+      "rvc": 0.059,
+      "rvt": 0.111,
+      "index": "andere reden"
+    }
+  ]
+}

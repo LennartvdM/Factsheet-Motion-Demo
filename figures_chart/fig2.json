@@ -1,0 +1,38 @@
+{
+  "id": "fig2",
+  "label": "Figuur 2",
+  "title": "Aandeel vrouwen in de top van charterorganisaties naar sector 2024 (N=84)",
+  "indexField": "index",
+  "rows": [
+    {
+      "Top": 0.384,
+      "Subtop": 0.55,
+      "Organisatie": 0.556,
+      "index": "1 - 249"
+    },
+    {
+      "Top": 0.337,
+      "Subtop": 0.448,
+      "Organisatie": 0.482,
+      "index": "250 - 999"
+    },
+    {
+      "Top": 0.343,
+      "Subtop": 0.412,
+      "Organisatie": 0.464,
+      "index": "1,000 - 4,999"
+    },
+    {
+      "Top": 0.371,
+      "Subtop": 0.382,
+      "Organisatie": 0.448,
+      "index": "5,000 en meer"
+    },
+    {
+      "Top": 0.355,
+      "Subtop": 0.428,
+      "Organisatie": 0.475,
+      "index": "Total"
+    }
+  ]
+}

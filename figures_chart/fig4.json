@@ -1,0 +1,65 @@
+{
+  "id": "fig4",
+  "label": "Figuur 4",
+  "title": "Ontwikkeling van aandeel vrouwen in de top van jonge en ervaren organisaties ",
+  "indexField": "index",
+  "rows": [
+    {
+      "TOP": 0.352,
+      "ORGANISATIE": 0.472,
+      "Unnamed: 13": "overwegen om top en organisatie samen te nemen. ",
+      "index": "Totaal"
+    },
+    {
+      "TOP": 0.24811,
+      "ORGANISATIE": 0.234,
+      "Unnamed: 13": "zie alternatief onderin TAB aandeel vrouwen Q",
+      "index": "Industrie & bouwnijverheid (n=6)"
+    },
+    {
+      "TOP": 0.28807,
+      "ORGANISATIE": 0.495,
+      "index": "Zakelijke dienstverlening (n=28)"
+    },
+    {
+      "TOP": 0.30714,
+      "ORGANISATIE": 0.494,
+      "index": "Overige dienstverlening (n=2)"
+    },
+    {
+      "TOP": 0.33814,
+      "ORGANISATIE": 0.465,
+      "index": "Handel & horeca (n=4)"
+    },
+    {
+      "TOP": 0.34652,
+      "ORGANISATIE": 0.444,
+      "index": "Financiële instellingen (n=9)"
+    },
+    {
+      "TOP": 0.38023,
+      "ORGANISATIE": 0.561,
+      "index": "Onderwijs (n=6)"
+    },
+    {
+      "TOP": 0.38163,
+      "ORGANISATIE": 0.326,
+      "index": "Vervoer & opslag (n=7)"
+    },
+    {
+      "TOP": 0.38997,
+      "ORGANISATIE": 0.318,
+      "index": "Informatie & communicatie (n=3)"
+    },
+    {
+      "TOP": 0.44774,
+      "ORGANISATIE": 0.671,
+      "index": "Gezondheids- & welzijnszorg (n=7)"
+    },
+    {
+      "TOP": 0.46924,
+      "ORGANISATIE": 0.522,
+      "index": "Overheid (n=12)"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "fig24",
+  "label": "Figuur 24",
+  "title": null,
+  "indexField": "index",
+  "rows": [
+    {
+      "leiderschap": 3.2,
+      "strategie": 2.7,
+      "HR": 3.4,
+      "Communicatie": 3.1,
+      "Kennis": 3.1,
+      "Klimaat": 3.2,
+      "index": "m/v-diversiteit"
+    },
+    {
+      "leiderschap": 84,
+      "strategie": 84,
+      "HR": 84,
+      "Communicatie": 84,
+      "Kennis": 84,
+      "Klimaat": 84,
+      "index": "N"
+    }
+  ]
+}

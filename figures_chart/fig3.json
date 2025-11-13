@@ -1,0 +1,38 @@
+{
+  "id": "fig3",
+  "label": "Figuur 3",
+  "title": "Aandeel vrouwen in de rvb, rvc en rvt van charterorganisaties, 2022 - 2023",
+  "indexField": "index",
+  "rows": [
+    {
+      "Top": 0.022930000000000006,
+      "Subtop": 0.023480000000000056,
+      "Organisatie": 0.0049200000000000355,
+      "index": "1-249 medewerkers"
+    },
+    {
+      "Top": -0.0011700000000000044,
+      "Subtop": 0.015710000000000002,
+      "Organisatie": -0.004269999999999996,
+      "index": "250-999 medewerkers"
+    },
+    {
+      "Top": 0.007030000000000036,
+      "Subtop": 0.024909999999999988,
+      "Organisatie": 0.002850000000000019,
+      "index": "1000-4999 medewerkers"
+    },
+    {
+      "Top": 0.026540000000000008,
+      "Subtop": 0.01855000000000001,
+      "Organisatie": 0.0012199999999999989,
+      "index": "5000 medewerkers en meer"
+    },
+    {
+      "Top": 0.012949999999999962,
+      "Subtop": 0.020409999999999984,
+      "Organisatie": 0.0009599999999999609,
+      "index": "Totaalpercentages"
+    }
+  ]
+}

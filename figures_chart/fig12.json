@@ -1,0 +1,50 @@
+{
+  "id": "fig12",
+  "label": "Figuur 12",
+  "title": null,
+  "indexField": "index",
+  "rows": [
+    {
+      "Orientatiefase": 0.06,
+      "Ontwikkelfase": 0.178,
+      "Realisatiefase": 0.536,
+      "Beheersingsfase": 0.226,
+      "index": "Communicatie "
+    },
+    {
+      "Orientatiefase": 0.024,
+      "Ontwikkelfase": 0.179,
+      "Realisatiefase": 0.56,
+      "Beheersingsfase": 0.238,
+      "index": "Kennis"
+    },
+    {
+      "Orientatiefase": 0.036,
+      "Ontwikkelfase": 0.19,
+      "Realisatiefase": 0.488,
+      "Beheersingsfase": 0.286,
+      "index": "Strategie en Mgt "
+    },
+    {
+      "Orientatiefase": 0,
+      "Ontwikkelfase": 0.119,
+      "Realisatiefase": 0.571,
+      "Beheersingsfase": 0.31,
+      "index": "Klimaat "
+    },
+    {
+      "Orientatiefase": 0,
+      "Ontwikkelfase": 0.095,
+      "Realisatiefase": 0.464,
+      "Beheersingsfase": 0.44,
+      "index": "HR"
+    },
+    {
+      "Orientatiefase": 0,
+      "Ontwikkelfase": 0.095,
+      "Realisatiefase": 0.417,
+      "Beheersingsfase": 0.488,
+      "index": "Leiderschap"
+    }
+  ]
+}

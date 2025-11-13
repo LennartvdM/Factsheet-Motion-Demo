@@ -1,0 +1,20 @@
+{
+  "id": "fig1",
+  "label": "Figuur 1",
+  "title": "Aandeel vrouwen in de top, subtop en totale organisatie van de charterorganisaties 2023 - 2024",
+  "indexField": "year",
+  "rows": [
+    {
+      "top": 0.355,
+      "subtop": 0.428,
+      "organisatie": 0.475,
+      "year": 2024
+    },
+    {
+      "top": 0.342,
+      "subtop": 0.408,
+      "organisatie": 0.474,
+      "year": 2023
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "fig8",
+  "label": "Figuur 8",
+  "title": "Realisatieniveau van inclusiviteit in 2024",
+  "indexField": "year",
+  "rows": [
+    {
+      "30% mv in rvb": 0.727,
+      "30% mv in rvc": 0.889,
+      "30% mv in rvt": 0.833,
+      "30% in alle bestuursorganen": 0.667,
+      "year": 2023
+    },
+    {
+      "30% mv in rvb": 0.701,
+      "30% mv in rvc": 0.914,
+      "30% mv in rvt": 0.9,
+      "30% in alle bestuursorganen": 0.676,
+      "year": 2024
+    }
+  ]
+}

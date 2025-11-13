@@ -1,0 +1,65 @@
+{
+  "id": "fig11",
+  "label": "Figuur 11",
+  "title": null,
+  "indexField": "index",
+  "rows": [
+    {
+      "Report": "Qoud_nieuw2",
+      "Unnamed: 4": "rvb",
+      "Unnamed: 5": "rvc",
+      "Unnamed: 6": "rvt",
+      "Unnamed: 7": "subtop",
+      "Unnamed: 8": "top",
+      "Unnamed: 9": "organisatie",
+      "Unnamed: 10": "behaald",
+      "index": null
+    },
+    {
+      "Report": "tm 2017",
+      "Unnamed: 3": "Mean",
+      "Unnamed: 4": 0.325,
+      "Unnamed: 5": 0.446,
+      "Unnamed: 6": 0.472,
+      "Unnamed: 7": 0.43174,
+      "Unnamed: 8": 0.35731,
+      "Unnamed: 9": 0.486,
+      "Unnamed: 10": 0.1268,
+      "index": null
+    },
+    {
+      "Unnamed: 3": "N",
+      "Unnamed: 4": 56,
+      "Unnamed: 5": 28,
+      "Unnamed: 6": 17,
+      "Unnamed: 7": 70,
+      "Unnamed: 8": 71,
+      "Unnamed: 9": 71,
+      "Unnamed: 10": 71,
+      "index": null
+    },
+    {
+      "Report": "va 2018",
+      "Unnamed: 3": "Mean",
+      "Unnamed: 4": 0.304,
+      "Unnamed: 5": 0.383,
+      "Unnamed: 6": 0.407,
+      "Unnamed: 7": 0.36879,
+      "Unnamed: 8": 0.3199,
+      "Unnamed: 9": 0.395,
+      "Unnamed: 10": 0.1538,
+      "index": null
+    },
+    {
+      "Unnamed: 3": "N",
+      "Unnamed: 4": 13,
+      "Unnamed: 5": 9,
+      "Unnamed: 6": 3,
+      "Unnamed: 7": 12,
+      "Unnamed: 8": 13,
+      "Unnamed: 9": 13,
+      "Unnamed: 10": 13,
+      "index": null
+    }
+  ]
+}

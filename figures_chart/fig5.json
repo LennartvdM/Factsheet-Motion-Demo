@@ -1,0 +1,53 @@
+{
+  "id": "fig5",
+  "label": "Figuur 5",
+  "title": "Ontwikkelingsniveaus per dimensie m/v diversiteit in 2024",
+  "indexField": "index",
+  "rows": [
+    {
+      "TOP": 0.012999999999999956,
+      "index": "Totaal"
+    },
+    {
+      "TOP": -0.03991,
+      "Unnamed: 19": "je kunt hier ook kiezen voor een horizontale staafdiagram zoals in figuur 4 (dan geclusterd)",
+      "index": "Overige dienstverlening"
+    },
+    {
+      "TOP": -0.0011999999999999789,
+      "index": "Financiële instellingen"
+    },
+    {
+      "TOP": 0.004479999999999984,
+      "index": "Overheid"
+    },
+    {
+      "TOP": 0.010940000000000005,
+      "index": "Zakelijke dienstverlening"
+    },
+    {
+      "TOP": 0.017080000000000012,
+      "index": "Industrie & bouwnijverheid"
+    },
+    {
+      "TOP": 0.018350000000000033,
+      "index": "Gezondheids- & welzijnszorg"
+    },
+    {
+      "TOP": 0.02203000000000005,
+      "index": "Vervoer & opslag"
+    },
+    {
+      "TOP": 0.02615999999999996,
+      "index": "Informatie & communicatie"
+    },
+    {
+      "TOP": 0.027400000000000035,
+      "index": "Onderwijs"
+    },
+    {
+      "TOP": 0.04800000000000004,
+      "index": "Handel & horeca"
+    }
+  ]
+}
