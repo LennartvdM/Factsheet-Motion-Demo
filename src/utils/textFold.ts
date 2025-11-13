@@ -4,8 +4,8 @@ import { inferSeriesSpecs } from '../types/ChartFigure';
 type TextLayers = {
   headline: string;
   tooltip: string;
-  overlay: string;
-  paragraph: string;
+  summary: string;
+  narrative: string[];
 };
 
 type Row = Record<string, string | number | null>;
@@ -198,8 +198,8 @@ export function createTextLayers(fig: ChartFigure): TextLayers {
     return {
       headline: fallback,
       tooltip: fallback,
-      overlay: fallback,
-      paragraph: fallback,
+      summary: fallback,
+      narrative: [fallback],
     };
   }
 
@@ -241,7 +241,8 @@ export function createTextLayers(fig: ChartFigure): TextLayers {
     overlaySentences.push('Additional data is required to describe the trend.');
   }
 
-  const overlay = overlaySentences.slice(0, 3).join(' ');
+  const summary = overlaySentences.slice(0, 2).join(' ');
+  const overlayParagraph = overlaySentences.join(' ');
 
   const paragraphSentences: string[] = [];
   paragraphSentences.push(
@@ -283,12 +284,28 @@ export function createTextLayers(fig: ChartFigure): TextLayers {
     paragraphSentences.push('These observations summarise the available chart data.');
   }
 
-  const paragraph = paragraphSentences.slice(0, 5).join(' ');
+  const narrativeParagraph = paragraphSentences.slice(0, 5).join(' ');
+
+  const narrative: string[] = [];
+
+  if (overlayParagraph) {
+    narrative.push(overlayParagraph);
+  }
+
+  if (narrativeParagraph) {
+    if (!overlayParagraph || overlayParagraph !== narrativeParagraph) {
+      narrative.push(narrativeParagraph);
+    }
+  }
+
+  if (narrative.length === 0) {
+    narrative.push(summary || headline);
+  }
 
   return {
     headline,
     tooltip,
-    overlay,
-    paragraph,
+    summary: summary || headline,
+    narrative,
   };
 }
