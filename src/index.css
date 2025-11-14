@@ -114,7 +114,7 @@ main:focus-visible {
 }
 
 .border-soft {
-  border-color: rgba(var(--color-border), 0.5);
+  border-color: rgba(var(--color-border), 0.32);
   transition: border-color 0.4s;
 }
 
