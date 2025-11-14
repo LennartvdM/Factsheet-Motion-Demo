@@ -21,7 +21,7 @@ export function KpiCard({ id, label, value, delta, onOpen, highlighted = false, 
       aria-labelledby={`${labelId} ${valueId}`}
       onClick={() => onOpen(id)}
       className={cn(
-        'group flex h-full flex-col gap-3 rounded-2xl border border-[rgba(var(--color-border),0.25)] bg-[rgba(var(--color-card),0.75)] p-6 text-left shadow-lg shadow-[rgba(var(--color-overlay),0.2)] backdrop-blur transition focus:outline-none focus-visible:ring-1 focus-visible:ring-[rgba(var(--color-accent),0.65)] focus-visible:ring-offset-1 focus-visible:ring-offset-[rgba(var(--color-bg),0.75)] hover:border-[rgba(var(--color-border),0.5)] hover:bg-[rgba(var(--color-card),0.9)] hover:shadow-[rgba(var(--color-overlay),0.3)]',
+        'group flex h-full flex-col gap-3 rounded-2xl border border-[rgba(var(--color-border),0.18)] bg-[rgba(var(--color-card),0.75)] p-6 text-left shadow-lg shadow-[rgba(var(--color-overlay),0.2)] backdrop-blur transition focus:outline-none focus-visible:ring-1 focus-visible:ring-[rgba(var(--color-accent),0.65)] focus-visible:ring-offset-1 focus-visible:ring-offset-[rgba(var(--color-bg),0.75)] hover:border-[rgba(var(--color-border),0.3)] hover:bg-[rgba(var(--color-card),0.9)] hover:shadow-[rgba(var(--color-overlay),0.3)]',
         highlighted
           ? reduceMotion
             ? 'border-[rgba(var(--color-accent),0.65)] shadow-[rgba(var(--color-accent),0.3)]'
