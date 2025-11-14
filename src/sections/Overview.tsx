@@ -154,7 +154,7 @@ export function Overview({
       {Array.from({ length: 4 }).map((_, index) => (
         <div
           key={index}
-          className="flex h-full flex-col gap-3 rounded-2xl border border-soft bg-[rgba(var(--color-card),0.6)] p-6 transition-colors"
+          className="flex h-full flex-col gap-3 rounded-2xl bg-[rgba(var(--color-card),0.6)] p-6 transition-colors"
         >
           <div className={cn('h-4 w-24 rounded-full bg-[rgba(var(--color-border),0.35)]', !shouldReduceMotion && 'animate-pulse')} />
           <div className={cn('h-8 w-32 rounded-full bg-[rgba(var(--color-border),0.35)]', !shouldReduceMotion && 'animate-pulse')} />
@@ -167,7 +167,7 @@ export function Overview({
 
   const trendContent = (
     <motion.section
-      className="overflow-hidden rounded-3xl border border-strong bg-[rgba(var(--color-card),0.8)] p-6 shadow-2xl shadow-[rgba(var(--color-overlay),0.3)] transition-colors"
+      className="overflow-hidden rounded-3xl border border-[rgba(var(--color-border),0.3)] bg-[rgba(var(--color-card),0.8)] p-6 shadow-2xl shadow-[rgba(var(--color-overlay),0.3)] transition-colors"
       initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
       animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
       transition={shouldReduceMotion ? undefined : { duration: 0.5, ease: 'easeOut' }}
@@ -181,20 +181,20 @@ export function Overview({
       </div>
       <Suspense
         fallback={
-          <div className="flex h-[32rem] items-center justify-center rounded-2xl border border-soft bg-[rgba(var(--color-card),0.6)] text-sm text-subtle">
+          <div className="flex h-[32rem] items-center justify-center rounded-2xl bg-[rgba(var(--color-card),0.6)] text-sm text-subtle">
             Loading trend insights…
           </div>
         }
       >
         <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
-          <div className="h-72 overflow-hidden rounded-2xl border border-strong bg-[rgba(var(--color-card),0.75)] p-4">
+          <div className="h-72 overflow-hidden rounded-2xl border border-[rgba(var(--color-border),0.3)] bg-[rgba(var(--color-card),0.75)] p-4">
             {facts ? (
               <TrendLine data={facts.trend} />
             ) : (
               <div className={cn('h-full rounded-xl bg-[rgba(var(--color-surface-muted),0.6)]', !shouldReduceMotion && 'animate-pulse')} />
             )}
           </div>
-          <div className="h-72 overflow-hidden rounded-2xl border border-strong bg-[rgba(var(--color-card),0.75)] p-4">
+          <div className="h-72 overflow-hidden rounded-2xl border border-[rgba(var(--color-border),0.3)] bg-[rgba(var(--color-card),0.75)] p-4">
             {facts ? (
               <BarBreakdown data={facts.categories} />
             ) : (
@@ -260,7 +260,7 @@ export function Overview({
                 ref={menuRef}
                 id="overview-export-menu"
                 role="menu"
-                className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-xl border border-soft bg-[rgba(var(--color-card),0.95)] p-1 shadow-xl shadow-[rgba(var(--color-overlay),0.25)] backdrop-blur transition"
+                className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-xl border border-[rgba(var(--color-border),0.35)] bg-[rgba(var(--color-card),0.95)] p-1 shadow-xl shadow-[rgba(var(--color-overlay),0.25)] backdrop-blur transition"
               >
                 <button
                   type="button"

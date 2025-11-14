@@ -65,7 +65,7 @@ export function Figures({ shouldReduceMotion = false }: FiguresSectionProps) {
         </p>
       </header>
 
-      <div className="rounded-3xl border border-strong bg-[rgba(var(--color-card),0.78)] p-6 shadow-2xl shadow-[rgba(var(--color-overlay),0.25)] backdrop-blur">
+      <div className="rounded-3xl border border-[rgba(var(--color-border),0.3)] bg-[rgba(var(--color-card),0.78)] p-6 shadow-2xl shadow-[rgba(var(--color-overlay),0.25)] backdrop-blur">
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {figures.map((figure) => (
             <FigureCard key={figure.id} fig={figure} showOverlay={false} onOpen={openPanel} />
@@ -114,7 +114,7 @@ function PanelOverlay({ figure, onClose, shouldReduceMotion }: PanelOverlayProps
           role="dialog"
           aria-modal="true"
           aria-labelledby="factsheet-panel-title"
-          className="relative flex h-full w-full max-w-xl flex-col overflow-hidden border-l border-strong bg-[rgba(var(--color-card),0.94)] text-left text-[rgb(var(--color-text))] shadow-2xl shadow-[rgba(var(--color-overlay),0.35)] backdrop-blur"
+          className="relative flex h-full w-full max-w-xl flex-col overflow-hidden border-l border-[rgba(var(--color-border),0.3)] bg-[rgba(var(--color-card),0.94)] text-left text-[rgb(var(--color-text))] shadow-2xl shadow-[rgba(var(--color-overlay),0.35)] backdrop-blur"
           initial={{ x: shouldReduceMotion ? 0 : '100%' }}
           animate={{ x: 0 }}
           exit={{ x: shouldReduceMotion ? 0 : '100%' }}
@@ -146,7 +146,7 @@ function PanelOverlay({ figure, onClose, shouldReduceMotion }: PanelOverlayProps
                   ))}
                 </div>
               ) : null}
-              <div className="rounded-3xl border border-soft bg-[rgba(var(--color-card),0.85)] p-4">
+              <div className="rounded-3xl bg-[rgba(var(--color-card),0.85)] p-4">
                 <FigureChart fig={figure} />
               </div>
             </div>

@@ -13,7 +13,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   primary:
     'bg-[rgb(var(--color-accent))] text-white shadow-sm hover:bg-[rgba(var(--color-accent),0.9)] focus-visible:bg-[rgba(var(--color-accent),0.92)]',
   ghost:
-    'border border-soft bg-[rgba(var(--color-card),0.6)] text-[rgb(var(--color-text))] hover:bg-[rgba(var(--color-card),0.8)] focus-visible:bg-[rgba(var(--color-card),0.85)]',
+    'border border-[rgba(var(--color-border),0.25)] bg-[rgba(var(--color-card),0.6)] text-[rgb(var(--color-text))] hover:border-[rgba(var(--color-border),0.45)] hover:bg-[rgba(var(--color-card),0.8)] focus-visible:bg-[rgba(var(--color-card),0.85)]',
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
