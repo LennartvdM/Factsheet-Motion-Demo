@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 
 import { KpiDetail } from './components/KpiDetail';
-import { ThemeToggle } from './components/ThemeToggle';
 import { Container } from './components/ui/Container';
 import { Segmented } from './components/ui/Segmented';
 import { VisuallyHidden } from './components/ui/VisuallyHidden';
@@ -299,13 +298,12 @@ export default function App() {
         </VisuallyHidden>
         <header className="border-b border-soft bg-[rgba(var(--color-surface-muted),0.75)] backdrop-blur">
           <Container className="flex flex-col gap-6 py-8">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-accent">Dashboard</p>
-                <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Live Factsheet</h1>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.35em] text-accent">Dashboard</p>
+                  <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Live Factsheet</h1>
+                </div>
               </div>
-              <ThemeToggle />
-            </div>
             <p className="max-w-2xl text-sm text-subtle">
               Monitor key metrics and trends at a glance. Adjust the timeframe to explore recent performance before sharing
               updates with your team.
