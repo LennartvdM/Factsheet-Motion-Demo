@@ -55,7 +55,7 @@ export function FigureCard({ fig, onOpen, onClose, showOverlay = true }: FigureC
           role="dialog"
           aria-modal="true"
           aria-labelledby={`${cardId}-dialog-label ${cardId}-dialog-title`}
-          className="relative flex w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-[rgba(var(--color-border),0.2)] bg-[rgba(var(--color-card),0.95)] text-[rgb(var(--color-text))] shadow-2xl shadow-[rgba(var(--color-overlay),0.35)] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)]"
+          className="relative flex w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-[rgba(var(--color-card),0.95)] text-[rgb(var(--color-text))] shadow-2xl shadow-[rgba(var(--color-overlay),0.35)] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)]"
         >
           <div className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-h-[calc(100vh-4rem)]" style={{ WebkitOverflowScrolling: 'touch' }}>
             <div className="sticky top-0 z-10 flex justify-end border-b border-soft bg-[rgba(var(--color-card),0.98)] px-8 py-5">
