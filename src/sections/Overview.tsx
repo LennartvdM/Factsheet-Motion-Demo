@@ -187,14 +187,14 @@ export function Overview({
         }
       >
         <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
-          <div className="h-72 overflow-hidden rounded-2xl bg-[rgba(var(--color-card),0.75)] p-4 shadow-lg shadow-[rgba(var(--color-overlay),0.2)]">
+          <div className="h-72 overflow-hidden rounded-2xl bg-[rgba(var(--color-card),0.75)] p-4 shadow-inner shadow-[rgba(var(--color-overlay),0.12)]">
             {facts ? (
               <TrendLine data={facts.trend} />
             ) : (
               <div className={cn('h-full rounded-xl bg-[rgba(var(--color-surface-muted),0.6)]', !shouldReduceMotion && 'animate-pulse')} />
             )}
           </div>
-          <div className="h-72 overflow-hidden rounded-2xl bg-[rgba(var(--color-card),0.75)] p-4 shadow-lg shadow-[rgba(var(--color-overlay),0.2)]">
+          <div className="h-72 overflow-hidden rounded-2xl bg-[rgba(var(--color-card),0.75)] p-4 shadow-inner shadow-[rgba(var(--color-overlay),0.12)]">
             {facts ? (
               <BarBreakdown data={facts.categories} />
             ) : (

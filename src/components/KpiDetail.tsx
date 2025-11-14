@@ -93,10 +93,10 @@ export function KpiDetail({ kpi, formattedValue, formattedDelta, generatedAt, tr
                 }
               >
                 <div className="grid gap-4">
-                  <div className="h-60 overflow-hidden rounded-2xl bg-[rgba(var(--color-card),0.78)] p-3 shadow-lg shadow-[rgba(var(--color-overlay),0.2)]">
+                  <div className="h-60 overflow-hidden rounded-2xl bg-[rgba(var(--color-card),0.75)] p-3 shadow-inner shadow-[rgba(var(--color-overlay),0.12)]">
                     <TrendLine data={trend} />
                   </div>
-                  <div className="h-60 overflow-hidden rounded-2xl bg-[rgba(var(--color-card),0.78)] p-3 shadow-lg shadow-[rgba(var(--color-overlay),0.2)]">
+                  <div className="h-60 overflow-hidden rounded-2xl bg-[rgba(var(--color-card),0.75)] p-3 shadow-inner shadow-[rgba(var(--color-overlay),0.12)]">
                     <BarBreakdown data={categories} />
                   </div>
                 </div>

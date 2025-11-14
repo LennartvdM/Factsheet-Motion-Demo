@@ -24,8 +24,8 @@ export function KpiCard({ id, label, value, delta, onOpen, highlighted = false, 
         'group flex h-full flex-col gap-3 rounded-2xl bg-[rgba(var(--color-card),0.75)] p-6 text-left shadow-lg shadow-[rgba(var(--color-overlay),0.2)] backdrop-blur transition focus:outline-none focus-visible:ring-1 focus-visible:ring-[rgba(var(--color-accent),0.65)] focus-visible:ring-offset-1 focus-visible:ring-offset-[rgba(var(--color-bg),0.75)] hover:bg-[rgba(var(--color-card),0.9)] hover:shadow-[rgba(var(--color-overlay),0.3)]',
         highlighted
           ? reduceMotion
-            ? 'shadow-[0_0_0_1.5px_rgba(var(--color-accent),0.55),0_28px_60px_-20px_rgba(var(--color-accent),0.35)]'
-            : 'shadow-[0_0_0_1.5px_rgba(var(--color-accent),0.55),0_28px_60px_-20px_rgba(var(--color-accent),0.4)] animate-pulse'
+            ? 'ring-1 ring-[rgba(var(--color-accent),0.65)] shadow-[rgba(var(--color-accent),0.3)]'
+            : 'ring-1 ring-[rgba(var(--color-accent),0.65)] shadow-[rgba(var(--color-accent),0.35)] animate-pulse'
           : undefined
       )}
       style={{ viewTransitionName: `kpi-${id}` }}
