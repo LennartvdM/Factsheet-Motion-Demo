@@ -42,7 +42,7 @@ export function KpiDetail({ kpi, formattedValue, formattedDelta, generatedAt, tr
           aria-modal="true"
           aria-labelledby={`kpi-${id}-detail-label`}
           className={cn(
-            'relative flex w-full max-w-lg flex-col rounded-3xl border border-[rgba(var(--color-border),0.2)] bg-[rgba(var(--color-card),0.95)] text-[rgb(var(--color-text))] shadow-2xl shadow-[rgba(var(--color-overlay),0.35)] transition-colors',
+            'relative flex w-full max-w-lg flex-col rounded-3xl bg-[rgba(var(--color-card),0.95)] text-[rgb(var(--color-text))] shadow-2xl shadow-[rgba(var(--color-overlay),0.35)] transition-colors',
             'max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-h-[calc(100vh-4rem)]'
           )}
           style={{ viewTransitionName: `kpi-${id}`, WebkitOverflowScrolling: 'touch' }}
@@ -93,10 +93,10 @@ export function KpiDetail({ kpi, formattedValue, formattedDelta, generatedAt, tr
                 }
               >
                 <div className="grid gap-4">
-                  <div className="h-60 overflow-hidden rounded-2xl border border-[rgba(var(--color-border),0.2)] bg-[rgba(var(--color-card),0.75)] p-3">
+                  <div className="h-60 overflow-hidden rounded-2xl bg-[rgba(var(--color-card),0.78)] p-3 shadow-lg shadow-[rgba(var(--color-overlay),0.2)]">
                     <TrendLine data={trend} />
                   </div>
-                  <div className="h-60 overflow-hidden rounded-2xl border border-[rgba(var(--color-border),0.2)] bg-[rgba(var(--color-card),0.75)] p-3">
+                  <div className="h-60 overflow-hidden rounded-2xl bg-[rgba(var(--color-card),0.78)] p-3 shadow-lg shadow-[rgba(var(--color-overlay),0.2)]">
                     <BarBreakdown data={categories} />
                   </div>
                 </div>
