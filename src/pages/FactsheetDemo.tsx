@@ -51,7 +51,7 @@ export function FactsheetDemo() {
 
   return (
     <div className="min-h-screen bg-[rgb(var(--color-bg))] py-16 text-[rgb(var(--color-text))] transition-colors">
-      <Container className="space-y-12">
+      <Container className="space-y-10">
         <header className="space-y-3 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.4em] text-muted">
             Factsheet Demo
@@ -65,15 +65,17 @@ export function FactsheetDemo() {
           </p>
         </header>
 
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {figures.map((figure) => (
-            <FigureCard
-              key={figure.id}
-              fig={figure}
-              showOverlay={false}
-              onOpen={openPanel}
-            />
-          ))}
+        <div className="rounded-3xl border border-strong bg-[rgba(var(--color-card),0.78)] p-6 shadow-2xl shadow-[rgba(var(--color-overlay),0.25)] backdrop-blur">
+          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+            {figures.map((figure) => (
+              <FigureCard
+                key={figure.id}
+                fig={figure}
+                showOverlay={false}
+                onOpen={openPanel}
+              />
+            ))}
+          </div>
         </div>
       </Container>
 
@@ -112,7 +114,7 @@ function PanelOverlay({ figure, onClose }: { figure: ChartFigure | null; onClose
           role="dialog"
           aria-modal="true"
           aria-labelledby="factsheet-panel-title"
-          className="relative flex h-full w-full max-w-xl flex-col overflow-hidden border-l border-soft bg-[rgba(var(--color-card),0.97)] text-left text-[rgb(var(--color-text))] shadow-2xl"
+          className="relative flex h-full w-full max-w-xl flex-col overflow-hidden border-l border-strong bg-[rgba(var(--color-card),0.94)] text-left text-[rgb(var(--color-text))] shadow-2xl shadow-[rgba(var(--color-overlay),0.35)] backdrop-blur"
           initial={{ x: '100%' }}
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
