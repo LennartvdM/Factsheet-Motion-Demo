@@ -134,7 +134,7 @@ export const Segmented = forwardRef<HTMLDivElement, SegmentedProps>(function Seg
             }}
             onKeyDown={(event) => handleKeyDown(event, index)}
             className={cn(
-              'relative rounded-xl px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-bg))]',
+              'relative rounded-xl px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-[rgba(var(--color-accent),0.65)] focus-visible:ring-offset-1 focus-visible:ring-offset-[rgba(var(--color-bg),0.75)]',
               isActive
                 ? 'bg-[rgb(var(--color-accent))] text-white shadow-sm'
                 : 'text-muted hover:bg-[rgba(var(--color-card),0.85)] hover:text-[rgb(var(--color-text))]'
