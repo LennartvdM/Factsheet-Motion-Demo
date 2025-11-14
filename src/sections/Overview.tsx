@@ -265,7 +265,7 @@ export function Overview({
                 <button
                   type="button"
                   role="menuitem"
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[rgb(var(--color-text))] transition hover:bg-[rgba(var(--color-card),0.9)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-card))]"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[rgb(var(--color-text))] transition hover:bg-[rgba(var(--color-card),0.9)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[rgba(var(--color-accent),0.65)] focus-visible:ring-offset-1 focus-visible:ring-offset-[rgba(var(--color-card),0.85)]"
                   onClick={handleExportCsv}
                 >
                   Export CSV
@@ -273,7 +273,7 @@ export function Overview({
                 <button
                   type="button"
                   role="menuitem"
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[rgb(var(--color-text))] transition hover:bg-[rgba(var(--color-card),0.9)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-accent))] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-card))]"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-[rgb(var(--color-text))] transition hover:bg-[rgba(var(--color-card),0.9)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[rgba(var(--color-accent),0.65)] focus-visible:ring-offset-1 focus-visible:ring-offset-[rgba(var(--color-card),0.85)]"
                   onClick={handleExportPng}
                 >
                   Export PNG

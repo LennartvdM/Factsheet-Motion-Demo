@@ -116,9 +116,9 @@ body {
   border-radius: 9999px;
   background: rgba(var(--color-overlay), 0.9);
   color: rgb(var(--color-card));
-  border: 2px solid rgb(var(--color-accent));
+  border: 1px solid rgba(var(--color-accent), 0.65);
   font-weight: 600;
-  box-shadow: 0 10px 30px rgba(var(--color-accent), 0.35);
+  box-shadow: 0 10px 24px rgba(var(--color-overlay), 0.35);
   transform: translateY(-200%);
   transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.4s, color 0.4s, border-color 0.4s;
 }
@@ -126,13 +126,13 @@ body {
 .skip-link:focus,
 .skip-link:focus-visible {
   transform: translateY(0);
-  box-shadow: 0 0 0 4px rgba(var(--color-accent), 0.35);
+  box-shadow: 0 0 0 3px rgba(var(--color-accent), 0.35);
   outline: none;
 }
 
 main:focus-visible {
-  outline: 3px solid rgb(var(--color-accent));
-  outline-offset: 0.5rem;
+  outline: 2px solid rgba(var(--color-accent), 0.75);
+  outline-offset: 0.35rem;
 }
 
 [data-exporting='true'],
@@ -165,12 +165,12 @@ main:focus-visible {
 }
 
 .border-soft {
-  border-color: rgba(var(--color-border), 0.65);
+  border-color: rgba(var(--color-border), 0.5);
   transition: border-color 0.4s;
 }
 
 .border-strong {
-  border-color: rgba(var(--color-border), 0.85);
+  border-color: rgba(var(--color-border), 0.7);
   transition: border-color 0.4s;
 }
 
