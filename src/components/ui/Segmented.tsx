@@ -108,7 +108,7 @@ export const Segmented = forwardRef<HTMLDivElement, SegmentedProps>(function Seg
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
       className={cn(
-        'inline-flex items-center gap-1 rounded-2xl border border-[rgba(var(--color-border),0.18)] bg-[rgba(var(--color-surface-muted),0.65)] p-1 shadow-inner shadow-[rgba(var(--color-overlay),0.15)] transition-colors',
+        'inline-flex items-center gap-1 rounded-2xl bg-[rgba(var(--color-surface-muted),0.65)] p-1 shadow-inner shadow-[rgba(var(--color-overlay),0.15)] transition-colors',
         className
       )}
     >
