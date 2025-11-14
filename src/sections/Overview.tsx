@@ -260,7 +260,7 @@ export function Overview({
                 ref={menuRef}
                 id="overview-export-menu"
                 role="menu"
-                className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-xl border border-[rgba(var(--color-border),0.22)] bg-[rgba(var(--color-card),0.95)] p-1 shadow-xl shadow-[rgba(var(--color-overlay),0.25)] backdrop-blur transition"
+                className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-xl bg-[rgba(var(--color-card),0.95)] p-1 shadow-xl shadow-[rgba(var(--color-overlay),0.25)] backdrop-blur transition"
               >
                 <button
                   type="button"
