@@ -172,7 +172,7 @@ export function Overview({
       animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
       transition={shouldReduceMotion ? undefined : { duration: 0.5, ease: 'easeOut' }}
     >
-      <div className="flex flex-col gap-2 pb-4">
+      <div className="flex flex-col gap-2 border-b border-soft pb-4">
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-accent">Trends</p>
         <h2 className="text-2xl font-semibold">Performance over time</h2>
         <p className="text-sm text-subtle">
@@ -181,12 +181,12 @@ export function Overview({
       </div>
       <Suspense
         fallback={
-          <div className="flex h-[32rem] items-center justify-center rounded-2xl bg-[rgba(var(--color-card),0.6)] text-sm text-subtle">
+          <div className="mt-4 flex h-[32rem] items-center justify-center rounded-2xl bg-[rgba(var(--color-card),0.6)] text-sm text-subtle">
             Loading trend insights…
           </div>
         }
       >
-        <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
+        <div className="mt-4 grid gap-6 lg:grid-cols-[2fr,1fr]">
           <div className="h-72 overflow-hidden rounded-2xl bg-[rgba(var(--color-card),0.75)] p-4 shadow-inner shadow-[rgba(var(--color-overlay),0.12)]">
             {facts ? (
               <TrendLine data={facts.trend} />

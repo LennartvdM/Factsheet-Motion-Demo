@@ -57,7 +57,7 @@ export function KpiDetail({ kpi, formattedValue, formattedDelta, generatedAt, tr
             </button>
           </div>
           <div className="space-y-4 px-8 pb-8 pt-6">
-            <div className="space-y-1">
+            <div className="space-y-1 border-b border-soft pb-4">
               <h2
                 id={`kpi-${id}-detail-label`}
                 ref={headingRef}

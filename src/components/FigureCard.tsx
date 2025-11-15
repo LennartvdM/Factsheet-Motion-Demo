@@ -68,7 +68,7 @@ export function FigureCard({ fig, onOpen, onClose, showOverlay = true }: FigureC
               </button>
             </div>
             <div className="space-y-4 px-8 pb-8 pt-6">
-              <div className="space-y-2">
+              <div className="space-y-2 border-b border-soft pb-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted" id={`${cardId}-dialog-label`}>
                   {fig.label}
                 </p>
@@ -81,7 +81,7 @@ export function FigureCard({ fig, onOpen, onClose, showOverlay = true }: FigureC
                   {textLayers.headline}
                 </h2>
               </div>
-              <div className="space-y-3 text-base leading-relaxed text-muted">
+              <div className="space-y-3 pt-4 text-base leading-relaxed text-muted">
                 {textLayers.narrative.map((paragraph, index) => (
                   <p key={index}>{paragraph}</p>
                 ))}
