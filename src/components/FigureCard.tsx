@@ -55,40 +55,39 @@ export function FigureCard({ fig, onOpen, onClose, showOverlay = true }: FigureC
           role="dialog"
           aria-modal="true"
           aria-labelledby={`${cardId}-dialog-label ${cardId}-dialog-title`}
-          className="relative flex w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-[rgba(var(--color-card),0.95)] text-[rgb(var(--color-text))] shadow-2xl shadow-[rgba(var(--color-overlay),0.35)] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)]"
+          className="relative flex w-full max-w-3xl flex-col overflow-x-hidden overflow-y-auto rounded-3xl bg-[rgba(var(--color-card),0.95)] text-[rgb(var(--color-text))] shadow-2xl shadow-[rgba(var(--color-overlay),0.35)] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)]"
+          style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          <div className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-h-[calc(100vh-4rem)]" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <div className="sticky top-0 z-10 flex justify-end border-b border-soft bg-[rgba(var(--color-card),0.98)] px-8 py-5">
-              <button
-                type="button"
-                onClick={handleClose}
-                className="rounded-full bg-[rgba(var(--color-surface-muted),0.85)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted transition hover:bg-[rgba(var(--color-surface-muted),1)] hover:text-[rgb(var(--color-text))] focus:outline-none focus-visible:ring-1 focus-visible:ring-[rgba(var(--color-accent),0.65)] focus-visible:ring-offset-1 focus-visible:ring-offset-[rgba(var(--color-card),0.85)]"
+          <div className="sticky top-0 z-10 flex justify-end border-b border-soft bg-[rgba(var(--color-card),0.98)] px-8 py-5">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="rounded-full bg-[rgba(var(--color-surface-muted),0.85)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted transition hover:bg-[rgba(var(--color-surface-muted),1)] hover:text-[rgb(var(--color-text))] focus:outline-none focus-visible:ring-1 focus-visible:ring-[rgba(var(--color-accent),0.65)] focus-visible:ring-offset-1 focus-visible:ring-offset-[rgba(var(--color-card),0.85)]"
+            >
+              Close
+            </button>
+          </div>
+          <div className="space-y-4 px-8 pb-8 pt-6">
+            <div className="space-y-2 border-b border-soft pb-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted" id={`${cardId}-dialog-label`}>
+                {fig.label}
+              </p>
+              <h2
+                id={`${cardId}-dialog-title`}
+                ref={headingRef}
+                tabIndex={-1}
+                className="text-4xl font-semibold"
               >
-                Close
-              </button>
+                {textLayers.headline}
+              </h2>
             </div>
-            <div className="space-y-4 px-8 pb-8 pt-6">
-              <div className="space-y-2 border-b border-soft pb-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted" id={`${cardId}-dialog-label`}>
-                  {fig.label}
-                </p>
-                <h2
-                  id={`${cardId}-dialog-title`}
-                  ref={headingRef}
-                  tabIndex={-1}
-                  className="text-4xl font-semibold"
-                >
-                  {textLayers.headline}
-                </h2>
-              </div>
-              <div className="space-y-3 pt-4 text-base leading-relaxed text-muted">
-                {textLayers.narrative.map((paragraph, index) => (
-                  <p key={index}>{paragraph}</p>
-                ))}
-              </div>
-              <div className="rounded-3xl bg-[rgba(var(--color-card),0.85)] p-4">
-                <FigureChart fig={fig} />
-              </div>
+            <div className="space-y-3 pt-4 text-base leading-relaxed text-muted">
+              {textLayers.narrative.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
+            </div>
+            <div className="rounded-3xl bg-[rgba(var(--color-card),0.85)] p-4">
+              <FigureChart fig={fig} />
             </div>
           </div>
         </div>
