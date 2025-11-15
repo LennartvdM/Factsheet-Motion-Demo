@@ -114,48 +114,47 @@ function PanelOverlay({ figure, onClose }: { figure: ChartFigure | null; onClose
           role="dialog"
           aria-modal="true"
           aria-labelledby="factsheet-panel-title"
-          className="relative flex h-full w-full max-w-xl flex-col overflow-hidden bg-[rgba(var(--color-card),0.94)] text-left text-[rgb(var(--color-text))] shadow-2xl shadow-[rgba(var(--color-overlay),0.35)] backdrop-blur"
+          className="relative flex h-full w-full max-w-xl flex-col overflow-x-hidden overflow-y-auto bg-[rgba(var(--color-card),0.94)] text-left text-[rgb(var(--color-text))] shadow-2xl shadow-[rgba(var(--color-overlay),0.35)] backdrop-blur"
+          style={{ WebkitOverflowScrolling: 'touch' }}
           initial={{ x: '100%' }}
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
           transition={overlaySpring}
         >
-          <div className="flex-1 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <div className="sticky top-0 z-10 border-b border-soft bg-[rgba(var(--color-card),0.97)] px-10 pb-5 pt-8">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted">
-                    {figure.label}
-                  </p>
-                  <h2
-                    id="factsheet-panel-title"
-                    ref={headingRef}
-                    tabIndex={-1}
-                    className="text-3xl font-semibold"
-                  >
-                    {textLayers?.headline ?? figure.title ?? figure.label}
-                  </h2>
-                </div>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="self-start rounded-full bg-[rgba(var(--color-surface-muted),0.85)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted transition hover:bg-[rgba(var(--color-surface-muted),1)] hover:text-[rgb(var(--color-text))] focus:outline-none focus-visible:ring-1 focus-visible:ring-[rgba(var(--color-accent),0.65)] focus-visible:ring-offset-1 focus-visible:ring-offset-[rgba(var(--color-card),0.85)]"
+          <div className="sticky top-0 z-10 border-b border-soft bg-[rgba(var(--color-card),0.97)] px-10 pb-5 pt-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted">
+                  {figure.label}
+                </p>
+                <h2
+                  id="factsheet-panel-title"
+                  ref={headingRef}
+                  tabIndex={-1}
+                  className="text-3xl font-semibold"
                 >
-                  Close
-                </button>
+                  {textLayers?.headline ?? figure.title ?? figure.label}
+                </h2>
               </div>
+              <button
+                type="button"
+                onClick={onClose}
+                className="self-start rounded-full bg-[rgba(var(--color-surface-muted),0.85)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted transition hover:bg-[rgba(var(--color-surface-muted),1)] hover:text-[rgb(var(--color-text))] focus:outline-none focus-visible:ring-1 focus-visible:ring-[rgba(var(--color-accent),0.65)] focus-visible:ring-offset-1 focus-visible:ring-offset-[rgba(var(--color-card),0.85)]"
+              >
+                Close
+              </button>
             </div>
-            <div className="space-y-4 px-10 pb-10 pt-6">
-              {textLayers ? (
-                <div className="space-y-4 text-base leading-relaxed text-muted">
-                  {textLayers.narrative.map((paragraph, index) => (
-                    <p key={index}>{paragraph}</p>
-                  ))}
-                </div>
-              ) : null}
-              <div className="rounded-3xl bg-[rgba(var(--color-card),0.85)] p-4">
-                <FigureChart fig={figure} />
+          </div>
+          <div className="space-y-4 px-10 pb-10 pt-6">
+            {textLayers ? (
+              <div className="space-y-4 text-base leading-relaxed text-muted">
+                {textLayers.narrative.map((paragraph, index) => (
+                  <p key={index}>{paragraph}</p>
+                ))}
               </div>
+            ) : null}
+            <div className="rounded-3xl bg-[rgba(var(--color-card),0.85)] p-4">
+              <FigureChart fig={figure} />
             </div>
           </div>
         </motion.aside>
