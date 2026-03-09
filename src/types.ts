@@ -53,16 +53,3 @@ export type Factset = {
   dimensions: DimensionScore[];
 };
 
-/* ------------------------------------------------------------------ */
-/*  Legacy aliases – keep chart components compiling without changes   */
-/* ------------------------------------------------------------------ */
-
-/** @deprecated use Metric */
-export type KPI = {
-  id: string;
-  label: string;
-  unit: 'count' | 'currency' | 'percent';
-  value: number;
-  delta: number;
-  updatedAt: string;
-};

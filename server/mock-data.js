@@ -168,20 +168,6 @@ export function generateInitialFactset(randomOrSeed) {
     metrics,
     trend,
     dimensions,
-
-    // ── Legacy fields consumed by chart components ──
-    kpis: metrics.map((m) => ({
-      id: m.id,
-      label: m.label,
-      unit: m.format === 'score' ? 'count' : 'percent',
-      value: m.value,
-      delta: m.value - m.previousValue,
-      updatedAt: m.updatedAt,
-    })),
-    categories: dimensions.map((d) => ({
-      category: d.dimension,
-      value: d.score,
-    })),
   };
 }
 
@@ -233,29 +219,13 @@ export function nextTick(previousFactset, randomOrSeed) {
     };
   });
 
-  const factset = {
+  return {
     generatedAt: new Date(generatedAt).toISOString(),
     measurementYear: previousFactset.measurementYear,
     metrics,
     trend,
     dimensions,
-
-    // ── Legacy fields ──
-    kpis: metrics.map((m) => ({
-      id: m.id,
-      label: m.label,
-      unit: m.format === 'score' ? 'count' : 'percent',
-      value: m.value,
-      delta: m.value - m.previousValue,
-      updatedAt: m.updatedAt,
-    })),
-    categories: dimensions.map((d) => ({
-      category: d.dimension,
-      value: d.score,
-    })),
   };
-
-  return factset;
 }
 
 export function createMockStream(seed = 1337) {
