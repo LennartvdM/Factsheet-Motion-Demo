@@ -1,78 +1,76 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 
-import { KpiDetail } from './components/KpiDetail';
+import { MetricDetail } from './components/MetricDetail';
 import { Container } from './components/ui/Container';
 import { Segmented } from './components/ui/Segmented';
 import { VisuallyHidden } from './components/ui/VisuallyHidden';
 import { withViewTransition } from './lib/viewTransition';
 import { getInitialFacts, subscribeFacts } from './data/client';
 import { ThemeProvider } from './theme/ThemeProvider';
-import type { Factset, KPI } from './types';
+import type { Factset, Metric } from './types';
 
-import { Breakdown } from './sections/Breakdown';
 import { Figures } from './sections/Figures';
-import { Notes } from './sections/Notes';
-import { Overview } from './sections/Overview';
+import { Inclusion } from './sections/Inclusion';
+import { Methodology } from './sections/Methodology';
+import { Representation } from './sections/Representation';
 
-const timeframeOptions = [
-  { label: 'Today', value: 'today' },
-  { label: '7d', value: '7d' },
-  { label: '30d', value: '30d' }
+const yearOptions = [
+  { label: '2022', value: '2022' },
+  { label: '2023', value: '2023' },
+  { label: '2024', value: '2024' },
 ];
 
 const tabOptions = [
-  { label: 'Overview', value: 'overview', id: 'tab-overview', controls: 'tab-panel-overview' },
-  { label: 'Breakdown', value: 'breakdown', id: 'tab-breakdown', controls: 'tab-panel-breakdown' },
+  { label: 'Representation', value: 'representation', id: 'tab-representation', controls: 'tab-panel-representation' },
+  { label: 'Inclusion', value: 'inclusion', id: 'tab-inclusion', controls: 'tab-panel-inclusion' },
   { label: 'Figures', value: 'figures', id: 'tab-figures', controls: 'tab-panel-figures' },
-  { label: 'Notes', value: 'notes', id: 'tab-notes', controls: 'tab-panel-notes' }
+  { label: 'Methodology', value: 'methodology', id: 'tab-methodology', controls: 'tab-panel-methodology' },
 ];
 
-const integerFormatter = new Intl.NumberFormat('en-US');
-const compactCurrencyFormatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  maximumFractionDigits: 1,
-  notation: 'compact'
-});
-const percentValueFormatter = new Intl.NumberFormat('en-US', {
+const percentFormatter = new Intl.NumberFormat('nl-NL', {
   style: 'percent',
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 0
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
 });
-const percentDeltaFormatter = new Intl.NumberFormat('en-US', {
+const scoreFormatter = new Intl.NumberFormat('nl-NL', {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 2,
+});
+const deltaFormatter = new Intl.NumberFormat('nl-NL', {
   style: 'percent',
   signDisplay: 'always',
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 1
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
 });
 
-function formatKpiValue(kpi: KPI): string {
-  switch (kpi.unit) {
-    case 'currency':
-      return compactCurrencyFormatter.format(kpi.value);
-    case 'percent':
-      return percentValueFormatter.format(kpi.value);
-    default:
-      return integerFormatter.format(kpi.value);
+function formatMetricValue(metric: Metric): string {
+  if (metric.format === 'score') {
+    return scoreFormatter.format(metric.value);
   }
+  return percentFormatter.format(metric.value);
 }
 
-function formatDelta(delta: number): string {
-  return percentDeltaFormatter.format(delta);
+function formatDelta(metric: Metric): string {
+  const delta = metric.value - metric.previousValue;
+  if (metric.format === 'score') {
+    const sign = delta >= 0 ? '+' : '';
+    return `${sign}${scoreFormatter.format(delta)}`;
+  }
+  return deltaFormatter.format(delta);
 }
 
-type DisplayKpi = {
+export type DisplayMetric = {
   id: string;
   label: string;
   value: string;
   delta: string;
-  raw: KPI;
+  raw: Metric;
 };
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<string>(tabOptions[0]?.value ?? 'overview');
-  const [timeframe, setTimeframe] = useState<string>(timeframeOptions[0]?.value ?? 'today');
+  const [activeTab, setActiveTab] = useState<string>(tabOptions[0]?.value ?? 'representation');
+  const [selectedYear, setSelectedYear] = useState<string>(yearOptions[2]?.value ?? '2024');
   const [openId, setOpenId] = useState<string | null>(null);
   const [facts, setFacts] = useState<Factset | null>(null);
   const [highlights, setHighlights] = useState<Record<string, boolean>>({});
@@ -151,10 +149,10 @@ export default function App() {
           return update;
         }
 
-        const changedIds = update.kpis.reduce<string[]>((acc, kpi) => {
-          const prior = previous.kpis.find((item) => item.id === kpi.id);
-          if (!prior || prior.value !== kpi.value || prior.delta !== kpi.delta) {
-            acc.push(kpi.id);
+        const changedIds = update.metrics.reduce<string[]>((acc, metric) => {
+          const prior = previous.metrics.find((item) => item.id === metric.id);
+          if (!prior || prior.value !== metric.value) {
+            acc.push(metric.id);
           }
           return acc;
         }, []);
@@ -162,17 +160,17 @@ export default function App() {
         if (changedIds.length > 0) {
           triggerHighlight(changedIds);
 
-          const changedLabels = update.kpis
-            .filter((kpi) => changedIds.includes(kpi.id))
-            .map((kpi) => kpi.label);
+          const changedLabels = update.metrics
+            .filter((m) => changedIds.includes(m.id))
+            .map((m) => m.label);
 
           if (changedLabels.length > 0) {
             const timestamp = new Date(update.generatedAt).toLocaleTimeString([], {
               hour: 'numeric',
               minute: '2-digit',
-              second: '2-digit'
+              second: '2-digit',
             });
-            setLiveAnnouncement(`Data updated: ${changedLabels.join(', ')} • ${timestamp}`);
+            setLiveAnnouncement(`Data updated: ${changedLabels.join(', ')} \u2022 ${timestamp}`);
           }
         }
 
@@ -199,17 +197,17 @@ export default function App() {
     };
   }, [triggerHighlight]);
 
-  const displayKpis = useMemo<DisplayKpi[] | undefined>(() => {
+  const displayMetrics = useMemo<DisplayMetric[] | undefined>(() => {
     if (!facts) {
       return undefined;
     }
 
-    return facts.kpis.map((kpi) => ({
-      id: kpi.id,
-      label: kpi.label,
-      value: formatKpiValue(kpi),
-      delta: formatDelta(kpi.delta),
-      raw: kpi
+    return facts.metrics.map((metric) => ({
+      id: metric.id,
+      label: metric.label,
+      value: formatMetricValue(metric),
+      delta: formatDelta(metric),
+      raw: metric,
     }));
   }, [facts]);
 
@@ -219,9 +217,9 @@ export default function App() {
     });
   };
 
-  const handleTimeframeChange = (value: string) => {
+  const handleYearChange = (value: string) => {
     withViewTransition(() => {
-      setTimeframe(value);
+      setSelectedYear(value);
     });
   };
 
@@ -237,44 +235,44 @@ export default function App() {
     });
   };
 
-  const activeKpi = openId ? displayKpis?.find((kpi) => kpi.id === openId) : undefined;
+  const activeMetric = openId ? displayMetrics?.find((m) => m.id === openId) : undefined;
   const lastUpdatedLabel = facts
     ? new Date(facts.generatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' })
     : null;
 
   const tabPanel = (() => {
     switch (activeTab) {
-      case 'breakdown':
+      case 'inclusion':
         return (
-          <Breakdown
-            timeframe={timeframe}
-            timeframeOptions={timeframeOptions}
-            onTimeframeChange={handleTimeframeChange}
+          <Inclusion
+            selectedYear={selectedYear}
+            yearOptions={yearOptions}
+            onYearChange={handleYearChange}
             shouldReduceMotion={shouldReduceMotion}
             facts={facts}
           />
         );
       case 'figures':
         return <Figures shouldReduceMotion={shouldReduceMotion} />;
-      case 'notes':
+      case 'methodology':
         return (
-          <Notes
-            timeframe={timeframe}
-            timeframeOptions={timeframeOptions}
-            onTimeframeChange={handleTimeframeChange}
+          <Methodology
+            selectedYear={selectedYear}
+            yearOptions={yearOptions}
+            onYearChange={handleYearChange}
             shouldReduceMotion={shouldReduceMotion}
             facts={facts}
           />
         );
-      case 'overview':
+      case 'representation':
       default:
         return (
-          <Overview
-            timeframe={timeframe}
-            timeframeOptions={timeframeOptions}
-            onTimeframeChange={handleTimeframeChange}
+          <Representation
+            selectedYear={selectedYear}
+            yearOptions={yearOptions}
+            onYearChange={handleYearChange}
             lastUpdatedLabel={lastUpdatedLabel}
-            displayKpis={displayKpis}
+            displayMetrics={displayMetrics}
             highlights={highlights}
             onOpenDetail={handleOpenDetail}
             shouldReduceMotion={shouldReduceMotion}
@@ -298,22 +296,26 @@ export default function App() {
         </VisuallyHidden>
         <header className="border-b border-soft bg-[rgba(var(--color-surface-muted),0.75)] backdrop-blur">
           <Container className="flex flex-col gap-6 py-8">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.35em] text-accent">Dashboard</p>
-                  <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Live Factsheet</h1>
-                </div>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-accent">
+                  Charter Diversiteit
+                </p>
+                <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+                  Diversity Monitor
+                </h1>
               </div>
+            </div>
             <p className="max-w-2xl text-sm text-subtle">
-              Monitor key metrics and trends at a glance. Adjust the timeframe to explore recent performance before sharing
-              updates with your team.
+              Tracking gender representation and inclusion policy maturity across charter organisations.
+              Select a measurement year to explore how organisations are progressing toward their diversity commitments.
             </p>
           </Container>
         </header>
         <main id="main-content" className="py-12" tabIndex={-1}>
           <Container className="space-y-10">
             <div className="flex flex-col gap-3">
-              <VisuallyHidden id="section-tabs-label">Select dashboard section</VisuallyHidden>
+              <VisuallyHidden id="section-tabs-label">Select monitor section</VisuallyHidden>
               <Segmented
                 type="tab"
                 options={tabOptions}
@@ -344,14 +346,14 @@ export default function App() {
             )}
           </Container>
         </main>
-        {activeKpi && facts ? (
-          <KpiDetail
-            kpi={activeKpi.raw}
-            formattedValue={activeKpi.value}
-            formattedDelta={activeKpi.delta}
+        {activeMetric && facts ? (
+          <MetricDetail
+            metric={activeMetric.raw}
+            formattedValue={activeMetric.value}
+            formattedDelta={activeMetric.delta}
             generatedAt={facts.generatedAt}
             trend={facts.trend}
-            categories={facts.categories}
+            dimensions={facts.dimensions}
             onClose={handleCloseDetail}
           />
         ) : null}

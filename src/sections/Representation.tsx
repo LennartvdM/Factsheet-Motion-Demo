@@ -1,23 +1,23 @@
 import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { KpiCard } from '../components/KpiCard';
+import { MetricCard } from '../components/MetricCard';
 import { Button } from '../components/ui/Button';
 import { Segmented } from '../components/ui/Segmented';
 import { VisuallyHidden } from '../components/ui/VisuallyHidden';
 import { cn } from '../lib/cn';
-import { exportKpiGridPng, exportSnapshotCsv } from '../lib/export';
-import type { Factset, KPI } from '../types';
+import { exportSnapshotCsv, exportKpiGridPng } from '../lib/export';
+import type { Factset, Metric } from '../types';
 
 const TrendLine = lazy(() => import('../components/charts/TrendLine'));
 const BarBreakdown = lazy(() => import('../components/charts/BarBreakdown'));
 
-type DisplayKpi = {
+type DisplayMetric = {
   id: string;
   label: string;
   value: string;
   delta: string;
-  raw: KPI;
+  raw: Metric;
 };
 
 type Option = {
@@ -25,36 +25,36 @@ type Option = {
   value: string;
 };
 
-type OverviewProps = {
-  timeframe: string;
-  timeframeOptions: Option[];
-  onTimeframeChange: (value: string) => void;
+type RepresentationProps = {
+  selectedYear: string;
+  yearOptions: Option[];
+  onYearChange: (value: string) => void;
   lastUpdatedLabel: string | null;
-  displayKpis?: DisplayKpi[];
+  displayMetrics?: DisplayMetric[];
   highlights: Record<string, boolean>;
   onOpenDetail: (id: string) => void;
   shouldReduceMotion: boolean;
   facts: Factset | null;
 };
 
-export function Overview({
-  timeframe,
-  timeframeOptions,
-  onTimeframeChange,
+export function Representation({
+  selectedYear,
+  yearOptions,
+  onYearChange,
   lastUpdatedLabel,
-  displayKpis,
+  displayMetrics,
   highlights,
   onOpenDetail,
   shouldReduceMotion,
-  facts
-}: OverviewProps) {
+  facts,
+}: RepresentationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const gridRef = useRef<HTMLDivElement | null>(null);
 
-  const timeframeLabel = timeframeOptions.find((option) => option.value === timeframe)?.label ?? timeframe;
-  const canExport = Boolean(displayKpis && displayKpis.length > 0 && facts);
+  const yearLabel = yearOptions.find((option) => option.value === selectedYear)?.label ?? selectedYear;
+  const canExport = Boolean(displayMetrics && displayMetrics.length > 0 && facts);
 
   useEffect(() => {
     if (!canExport) {
@@ -102,21 +102,28 @@ export function Overview({
   }, [isMenuOpen]);
 
   const handleExportCsv = () => {
-    if (!displayKpis || !facts) {
+    if (!displayMetrics || !facts) {
       return;
     }
 
     exportSnapshotCsv({
-      kpis: displayKpis.map((kpi) => kpi.raw),
+      kpis: displayMetrics.map((m) => ({
+        id: m.raw.id,
+        label: m.raw.label,
+        unit: m.raw.format === 'score' ? 'count' as const : 'percent' as const,
+        value: m.raw.value,
+        delta: m.raw.value - m.raw.previousValue,
+        updatedAt: m.raw.updatedAt,
+      })),
       trend: facts.trend.slice(-30),
       generatedAt: facts.generatedAt,
-      timeframe: timeframeLabel,
+      timeframe: yearLabel,
     });
     setIsMenuOpen(false);
   };
 
   const handleExportPng = () => {
-    if (!displayKpis || !facts) {
+    if (!displayMetrics || !facts) {
       return;
     }
 
@@ -129,22 +136,22 @@ export function Overview({
     void exportKpiGridPng({
       element,
       reduceMotion: shouldReduceMotion,
-      timeframe: timeframeLabel,
+      timeframe: yearLabel,
     });
     setIsMenuOpen(false);
   };
 
-  const grid = displayKpis ? (
+  const grid = displayMetrics ? (
     <div ref={gridRef} className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {displayKpis.map((kpi) => (
-        <KpiCard
-          key={kpi.id}
-          id={kpi.id}
-          label={kpi.label}
-          value={kpi.value}
-          delta={kpi.delta}
+      {displayMetrics.map((metric) => (
+        <MetricCard
+          key={metric.id}
+          id={metric.id}
+          label={metric.label}
+          value={metric.value}
+          delta={metric.delta}
           onOpen={onOpenDetail}
-          highlighted={Boolean(highlights[kpi.id])}
+          highlighted={Boolean(highlights[metric.id])}
           reduceMotion={shouldReduceMotion}
         />
       ))}
@@ -174,15 +181,16 @@ export function Overview({
     >
       <div className="flex flex-col gap-2 border-b border-soft pb-4">
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-accent">Trends</p>
-        <h2 className="text-2xl font-semibold">Performance over time</h2>
+        <h2 className="text-2xl font-semibold">Representation over time</h2>
         <p className="text-sm text-subtle">
-          Explore how engagement evolves across the network and where regional momentum is accelerating.
+          Track how women&apos;s representation in top leadership positions has evolved
+          across charter organisations from 2019 to the latest measurement year.
         </p>
       </div>
       <Suspense
         fallback={
           <div className="mt-4 flex h-[32rem] items-center justify-center rounded-2xl bg-[rgba(var(--color-card),0.6)] text-sm text-subtle">
-            Loading trend insights…
+            Loading trend data…
           </div>
         }
       >
@@ -196,7 +204,7 @@ export function Overview({
           </div>
           <div className="h-72 overflow-hidden rounded-2xl bg-[rgba(var(--color-card),0.75)] p-4 shadow-inner shadow-[rgba(var(--color-overlay),0.12)]">
             {facts ? (
-              <BarBreakdown data={facts.categories} />
+              <BarBreakdown data={facts.dimensions.map((d) => ({ category: d.dimension, value: d.score }))} />
             ) : (
               <div className={cn('h-full rounded-xl bg-[rgba(var(--color-surface-muted),0.6)]', !shouldReduceMotion && 'animate-pulse')} />
             )}
@@ -209,7 +217,7 @@ export function Overview({
   const fadeContent = (
     <AnimatePresence mode="wait" initial={false}>
       <motion.div
-        key={timeframe}
+        key={selectedYear}
         initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.92 }}
         animate={shouldReduceMotion ? undefined : { opacity: 1, scale: 1 }}
         exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.92 }}
@@ -226,20 +234,20 @@ export function Overview({
     <div className="space-y-10">
       <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
-          <h2 className="text-lg font-semibold">Overview</h2>
-          <p className="text-sm text-subtle">Track activity across the selected timeframe.</p>
+          <h2 className="text-lg font-semibold">Representation</h2>
+          <p className="text-sm text-subtle">Gender representation in top, subtop, and full organisation.</p>
           {lastUpdatedLabel ? (
             <p className="text-xs font-medium uppercase tracking-[0.3em] text-subtle">Last updated {lastUpdatedLabel}</p>
           ) : null}
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-          <div role="group" aria-labelledby="overview-timeframe-label">
-            <VisuallyHidden id="overview-timeframe-label">Select timeframe</VisuallyHidden>
+          <div role="group" aria-labelledby="representation-year-label">
+            <VisuallyHidden id="representation-year-label">Select measurement year</VisuallyHidden>
             <Segmented
-              options={timeframeOptions}
-              value={timeframe}
-              onValueChange={onTimeframeChange}
-              ariaLabelledBy="overview-timeframe-label"
+              options={yearOptions}
+              value={selectedYear}
+              onValueChange={onYearChange}
+              ariaLabelledBy="representation-year-label"
             />
           </div>
           <div className="relative">
@@ -249,7 +257,7 @@ export function Overview({
               className="sm:w-auto"
               aria-haspopup="menu"
               aria-expanded={isMenuOpen}
-              aria-controls="overview-export-menu"
+              aria-controls="representation-export-menu"
               onClick={() => setIsMenuOpen((open) => !open)}
               disabled={!canExport}
             >
@@ -258,7 +266,7 @@ export function Overview({
             {isMenuOpen ? (
               <div
                 ref={menuRef}
-                id="overview-export-menu"
+                id="representation-export-menu"
                 role="menu"
                 className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-xl bg-[rgba(var(--color-card),0.95)] p-1 shadow-xl shadow-[rgba(var(--color-overlay),0.25)] backdrop-blur transition"
               >

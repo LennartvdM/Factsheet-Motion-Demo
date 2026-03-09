@@ -3,7 +3,7 @@ import {
   useMemo,
   useRef,
   useState,
-  type MouseEvent as ReactMouseEvent
+  type MouseEvent as ReactMouseEvent,
 } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -23,7 +23,7 @@ type FiguresSectionProps = {
 const overlaySpring = {
   type: 'spring',
   stiffness: 260,
-  damping: 28
+  damping: 28,
 };
 
 export function Figures({ shouldReduceMotion = false }: FiguresSectionProps) {
@@ -57,11 +57,12 @@ export function Figures({ shouldReduceMotion = false }: FiguresSectionProps) {
       <header className="space-y-2">
         <p className="text-xs font-semibold uppercase tracking-[0.35em] text-subtle">Figures</p>
         <h2 id="figures-section-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Visual narratives powering the dashboard
+          Charter research in detail
         </h2>
         <p className="max-w-2xl text-sm text-subtle">
-          Dive into the complete gallery of charts informing the factsheet. Select a figure to reveal its detailed story and
-          chart breakdown.
+          The full set of figures from the Charter Diversity factsheet. Each visualisation covers
+          a specific aspect of representation, policy maturity, or inclusion across charter organisations.
+          Select a figure to explore its data and narrative.
         </p>
       </header>
 
@@ -96,7 +97,7 @@ function PanelOverlay({ figure, onClose, shouldReduceMotion }: PanelOverlayProps
         onClose();
       }
     },
-    [onClose]
+    [onClose],
   );
 
   const overlayContent = !figure ? null : (
