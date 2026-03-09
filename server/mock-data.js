@@ -1,20 +1,77 @@
-const KPI_CONFIG = [
-  { id: 'active-users', label: 'Active Users', unit: 'count', base: 1248, volatility: 0.08, deltaRange: [-0.04, 0.14] },
-  { id: 'new-signups', label: 'New Signups', unit: 'count', base: 342, volatility: 0.12, deltaRange: [-0.06, 0.18] },
-  { id: 'retention', label: 'Retention', unit: 'percent', base: 0.78, volatility: 0.04, deltaRange: [-0.05, 0.08] },
-  { id: 'revenue', label: 'Revenue', unit: 'currency', base: 24300, volatility: 0.07, deltaRange: [-0.03, 0.12] }
+/**
+ * Mock data generator for the Charter Diversity Monitor.
+ *
+ * Instead of fake SaaS metrics, this generates data that mirrors the real
+ * diversity & inclusion research: women's representation at different
+ * organisational levels and inclusion-policy dimension scores.
+ *
+ * Values are seeded from actual Charter Diversiteit factsheet figures so
+ * the demo shows realistic magnitudes and relationships.
+ */
+
+/* ------------------------------------------------------------------ */
+/*  Metric configuration – rooted in real Charter data                 */
+/* ------------------------------------------------------------------ */
+
+const METRIC_CONFIG = [
+  {
+    id: 'vrouwen-top',
+    label: 'Women in Top',
+    format: 'percent',
+    // 2024 value from fig1: 35.5 %
+    base: 0.355,
+    volatility: 0.012,
+    history: [0.29, 0.305, 0.315, 0.328, 0.342, 0.355],
+  },
+  {
+    id: 'vrouwen-subtop',
+    label: 'Women in Subtop',
+    format: 'percent',
+    base: 0.428,
+    volatility: 0.01,
+    history: [0.37, 0.385, 0.392, 0.401, 0.408, 0.428],
+  },
+  {
+    id: 'vrouwen-organisatie',
+    label: 'Women in Organisation',
+    format: 'percent',
+    base: 0.475,
+    volatility: 0.006,
+    history: [0.46, 0.462, 0.465, 0.47, 0.474, 0.475],
+  },
+  {
+    id: 'beleidsniveau',
+    label: 'Policy Maturity',
+    format: 'score',
+    // Average across inclusion dimensions ≈ 3.0 on a 1-5 scale
+    base: 3.0,
+    volatility: 0.08,
+    history: [2.4, 2.55, 2.7, 2.8, 2.9, 3.0],
+  },
 ];
 
-const CATEGORY_CONFIG = [
-  { category: 'North', base: 320 },
-  { category: 'South', base: 280 },
-  { category: 'East', base: 360 },
-  { category: 'West', base: 300 },
-  { category: 'Online', base: 420 }
+/* ------------------------------------------------------------------ */
+/*  Inclusion-policy dimensions – from fig20/fig23                     */
+/* ------------------------------------------------------------------ */
+
+const DIMENSION_CONFIG = [
+  { dimension: 'Leadership',              base: 3.3 },
+  { dimension: 'Strategy & Management',   base: 2.8 },
+  { dimension: 'HR Management',           base: 3.1 },
+  { dimension: 'Communication',           base: 2.8 },
+  { dimension: 'Knowledge & Skills',      base: 2.8 },
+  { dimension: 'Climate',                 base: 3.0 },
 ];
 
-const TREND_POINTS = 12;
-const TREND_INTERVAL = 5 * 60 * 1000;
+/* ------------------------------------------------------------------ */
+/*  Trend — represents years of measurement (2019-2024)               */
+/* ------------------------------------------------------------------ */
+
+const TREND_LABELS = ['2019', '2020', '2021', '2022', '2023', '2024'];
+
+/* ------------------------------------------------------------------ */
+/*  Seeded RNG (identical to original)                                 */
+/* ------------------------------------------------------------------ */
 
 const RNG_MODULUS = 2147483647;
 const RNG_MULTIPLIER = 48271;
@@ -47,58 +104,50 @@ function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
 
-function randomBetween(random, min, max) {
-  return min + (max - min) * random();
-}
+/* ------------------------------------------------------------------ */
+/*  Data generation                                                    */
+/* ------------------------------------------------------------------ */
 
-function createKpi(config, random, timestamp) {
-  const { unit, base, volatility, deltaRange } = config;
-  const drift = (random() - 0.5) * volatility;
+function createMetric(config, random, timestamp) {
+  const drift = (random() - 0.5) * config.volatility;
   const value =
-    unit === 'percent'
-      ? Number(clamp(base + drift * 0.25, 0.4, 0.99).toFixed(3))
-      : Math.max(0, Math.round(base * (1 + drift)));
-  const delta = Number(randomBetween(random, deltaRange[0], deltaRange[1]).toFixed(3));
+    config.format === 'score'
+      ? Number(clamp(config.base + drift, 1.0, 5.0).toFixed(2))
+      : Number(clamp(config.base + drift, 0.05, 0.99).toFixed(3));
+
+  const historyLen = config.history.length;
+  const previousValue =
+    historyLen >= 2 ? config.history[historyLen - 2] : config.base;
 
   return {
     id: config.id,
     label: config.label,
-    unit,
+    format: config.format,
     value,
-    delta,
-    updatedAt: new Date(timestamp).toISOString()
+    previousValue,
+    year: 2024,
+    updatedAt: new Date(timestamp).toISOString(),
   };
 }
 
-function formatTimeLabel(timestamp) {
-  return new Intl.DateTimeFormat('en-US', {
-    hour: 'numeric',
-    minute: '2-digit'
-  }).format(new Date(timestamp));
+function generateTrend(random) {
+  // Base series: women in top (the headline metric) over measurement years
+  const baseHistory = METRIC_CONFIG[0].history;
+  return TREND_LABELS.map((label, index) => {
+    const base = baseHistory[index] ?? baseHistory[baseHistory.length - 1];
+    // Add tiny jitter so the chart isn't perfectly smooth
+    const jitter = (random() - 0.5) * 0.005;
+    return {
+      date: label,
+      value: Number((base + jitter).toFixed(3)),
+    };
+  });
 }
 
-function generateTrend(random, baseTimestamp) {
-  const start = baseTimestamp - (TREND_POINTS - 1) * TREND_INTERVAL;
-  let lastValue = 880 + Math.round(random() * 180);
-  const points = [];
-
-  for (let index = 0; index < TREND_POINTS; index += 1) {
-    if (index > 0) {
-      const trendDrift = (random() - 0.5) * 0.12;
-      lastValue = Math.max(120, Math.round(lastValue * (1 + trendDrift)));
-    }
-
-    const timestamp = start + index * TREND_INTERVAL;
-    points.push({ date: formatTimeLabel(timestamp), value: lastValue });
-  }
-
-  return points;
-}
-
-function generateCategories(random) {
-  return CATEGORY_CONFIG.map((category) => ({
-    category: category.category,
-    value: Math.max(0, Math.round(category.base * (0.85 + random() * 0.25)))
+function generateDimensions(random) {
+  return DIMENSION_CONFIG.map((dim) => ({
+    dimension: dim.dimension,
+    score: Number(clamp(dim.base + (random() - 0.5) * 0.15, 1.0, 5.0).toFixed(2)),
   }));
 }
 
@@ -106,64 +155,107 @@ export function generateInitialFactset(randomOrSeed) {
   const random = resolveRandom(randomOrSeed);
   const generatedAt = Date.now();
 
+  // Build the legacy-compatible shape so client.ts / server keep working
+  const metrics = METRIC_CONFIG.map((config) =>
+    createMetric(config, random, generatedAt)
+  );
+  const trend = generateTrend(random);
+  const dimensions = generateDimensions(random);
+
   return {
     generatedAt: new Date(generatedAt).toISOString(),
-    kpis: KPI_CONFIG.map((config) => createKpi(config, random, generatedAt)),
-    trend: generateTrend(random, generatedAt),
-    categories: generateCategories(random)
+    measurementYear: 2024,
+    metrics,
+    trend,
+    dimensions,
+
+    // ── Legacy fields consumed by chart components ──
+    kpis: metrics.map((m) => ({
+      id: m.id,
+      label: m.label,
+      unit: m.format === 'score' ? 'count' : 'percent',
+      value: m.value,
+      delta: m.value - m.previousValue,
+      updatedAt: m.updatedAt,
+    })),
+    categories: dimensions.map((d) => ({
+      category: d.dimension,
+      value: d.score,
+    })),
   };
 }
 
-const KPI_BY_ID = Object.fromEntries(KPI_CONFIG.map((config) => [config.id, config]));
+const METRIC_BY_ID = Object.fromEntries(
+  METRIC_CONFIG.map((config) => [config.id, config])
+);
 
 export function nextTick(previousFactset, randomOrSeed) {
   const random = resolveRandom(randomOrSeed);
-  const baseTimestamp = new Date(previousFactset.generatedAt).getTime() || Date.now();
-  const generatedAt = baseTimestamp + Math.round(randomBetween(random, 180000, 300000));
+  const baseTimestamp =
+    new Date(previousFactset.generatedAt).getTime() || Date.now();
+  const generatedAt =
+    baseTimestamp + Math.round(3000 + random() * 2000);
 
-  const kpis = previousFactset.kpis.map((kpi) => {
-    const config = KPI_BY_ID[kpi.id];
-    const volatility = config?.volatility ?? 0.08;
-    const deltaRange = config?.deltaRange ?? [-0.04, 0.12];
+  const metrics = previousFactset.metrics.map((metric) => {
+    const config = METRIC_BY_ID[metric.id];
+    const volatility = config?.volatility ?? 0.01;
     const drift = (random() - 0.5) * volatility;
 
     let nextValue;
-    if (kpi.unit === 'percent') {
-      nextValue = Number(clamp(kpi.value + drift * 0.2, 0.35, 0.99).toFixed(3));
+    if (metric.format === 'score') {
+      nextValue = Number(clamp(metric.value + drift, 1.0, 5.0).toFixed(2));
     } else {
-      nextValue = Math.max(0, Math.round(kpi.value * (1 + drift)));
+      nextValue = Number(clamp(metric.value + drift, 0.05, 0.99).toFixed(3));
     }
 
-    const deltaDrift = randomBetween(random, -0.02, 0.02);
-    const nextDelta = clamp(kpi.delta + deltaDrift, deltaRange[0], deltaRange[1]);
-
     return {
-      ...kpi,
+      ...metric,
       value: nextValue,
-      delta: Number(nextDelta.toFixed(3)),
-      updatedAt: new Date(generatedAt).toISOString()
+      updatedAt: new Date(generatedAt).toISOString(),
     };
   });
 
-  const trendSeed = previousFactset.trend.length ? previousFactset.trend[previousFactset.trend.length - 1].value : 940;
-  const trend = previousFactset.trend
-    .slice(-(TREND_POINTS - 1))
-    .concat({
-      date: formatTimeLabel(generatedAt),
-      value: Math.max(120, Math.round(trendSeed * (1 + (random() - 0.5) * 0.14)))
-    });
+  // Trend: slide window — append latest "Women in Top" value
+  const latestTop = metrics.find((m) => m.id === 'vrouwen-top');
+  const trend = previousFactset.trend.slice(-5).concat({
+    date: String(previousFactset.measurementYear),
+    value: latestTop ? latestTop.value : 0.35,
+  });
 
-  const categories = previousFactset.categories.map((category) => ({
-    category: category.category,
-    value: Math.max(0, Math.round(category.value * (0.94 + random() * 0.12)))
-  }));
+  const dimensions = previousFactset.dimensions.map((dim) => {
+    const base = DIMENSION_CONFIG.find((d) => d.dimension === dim.dimension);
+    const drift = (random() - 0.5) * 0.08;
+    return {
+      dimension: dim.dimension,
+      score: Number(
+        clamp(dim.score + drift, 1.0, 5.0).toFixed(2)
+      ),
+    };
+  });
 
-  return {
+  const factset = {
     generatedAt: new Date(generatedAt).toISOString(),
-    kpis,
+    measurementYear: previousFactset.measurementYear,
+    metrics,
     trend,
-    categories
+    dimensions,
+
+    // ── Legacy fields ──
+    kpis: metrics.map((m) => ({
+      id: m.id,
+      label: m.label,
+      unit: m.format === 'score' ? 'count' : 'percent',
+      value: m.value,
+      delta: m.value - m.previousValue,
+      updatedAt: m.updatedAt,
+    })),
+    categories: dimensions.map((d) => ({
+      category: d.dimension,
+      value: d.score,
+    })),
   };
+
+  return factset;
 }
 
 export function createMockStream(seed = 1337) {
@@ -177,6 +269,6 @@ export function createMockStream(seed = 1337) {
     next() {
       current = nextTick(current, random);
       return clone(current);
-    }
+    },
   };
 }
