@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 
 import { MetricDetail } from './components/MetricDetail';
@@ -6,7 +6,7 @@ import { Container } from './components/ui/Container';
 import { Segmented } from './components/ui/Segmented';
 import { VisuallyHidden } from './components/ui/VisuallyHidden';
 import { withViewTransition } from './lib/viewTransition';
-import { useFactstream } from './hooks/useFactstream';
+import { getResearchFactset, getSparklineValues, getMetricTrend } from './data/research';
 import type { Metric } from './types';
 
 import { Figures } from './sections/Figures';
@@ -40,27 +40,80 @@ function fmtDelta(m: Metric) {
   return m.format === 'score' ? `${d >= 0 ? '+' : ''}${scoreFmt.format(d)}` : deltaFmt.format(d);
 }
 
-export type DisplayMetric = { id: string; label: string; value: string; delta: string; raw: Metric };
+export type DisplayMetric = {
+  id: string;
+  label: string;
+  value: string;
+  rawValue: number;
+  delta: string;
+  sparkline: number[];
+  format: 'percent' | 'score';
+  raw: Metric;
+};
+
+function parseHash(): { tab?: string; year?: string } {
+  const hash = window.location.hash.slice(1);
+  if (!hash) return {};
+  const params = new URLSearchParams(hash);
+  return { tab: params.get('tab') ?? undefined, year: params.get('year') ?? undefined };
+}
+
+function writeHash(tab: string, year: string) {
+  const hash = `tab=${tab}&year=${year}`;
+  window.history.replaceState(null, '', `#${hash}`);
+}
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState(tabOptions[0].value);
-  const [selectedYear, setSelectedYear] = useState(yearOptions[2].value);
+  const initial = parseHash();
+  const [activeTab, setActiveTab] = useState(
+    tabOptions.find((t) => t.value === initial.tab)?.value ?? tabOptions[0].value,
+  );
+  const [selectedYear, setSelectedYear] = useState(
+    yearOptions.find((y) => y.value === initial.year)?.value ?? yearOptions[2].value,
+  );
   const [openId, setOpenId] = useState<string | null>(null);
-
-  const { facts, highlights, liveAnnouncement } = useFactstream();
   const shouldReduceMotion = useReducedMotion() ?? false;
 
-  const displayMetrics = useMemo<DisplayMetric[] | undefined>(
-    () => facts?.metrics.map((m) => ({ id: m.id, label: m.label, value: fmtValue(m), delta: fmtDelta(m), raw: m })),
+  // Real research data, changes when year changes
+  const facts = useMemo(() => getResearchFactset(Number(selectedYear)), [selectedYear]);
+
+  const displayMetrics = useMemo<DisplayMetric[]>(
+    () =>
+      facts.metrics.map((m) => ({
+        id: m.id,
+        label: m.label,
+        value: fmtValue(m),
+        rawValue: m.value,
+        delta: fmtDelta(m),
+        sparkline: getSparklineValues(m.id),
+        format: m.format,
+        raw: m,
+      })),
     [facts],
   );
 
+  // Update document title based on active tab and year
+  useEffect(() => {
+    const tabLabel = tabOptions.find((t) => t.value === activeTab)?.label ?? 'Monitor';
+    document.title = `${tabLabel} ${selectedYear} — Charter Diversity Monitor`;
+    writeHash(activeTab, selectedYear);
+  }, [activeTab, selectedYear]);
+
+  // Listen to hash changes (browser back/forward)
+  useEffect(() => {
+    function onHashChange() {
+      const h = parseHash();
+      if (h.tab && tabOptions.some((t) => t.value === h.tab)) setActiveTab(h.tab);
+      if (h.year && yearOptions.some((y) => y.value === h.year)) setSelectedYear(h.year);
+    }
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
   const vt = (fn: () => void) => withViewTransition(fn);
 
-  const activeMetric = openId ? displayMetrics?.find((m) => m.id === openId) : undefined;
-  const lastUpdated = facts
-    ? new Date(facts.generatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' })
-    : null;
+  const activeMetric = openId ? displayMetrics.find((m) => m.id === openId) : undefined;
+  const lastUpdated = new Date(facts.generatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' });
 
   const tabPanel = (() => {
     switch (activeTab) {
@@ -71,14 +124,13 @@ export default function App() {
       case 'methodology':
         return <Methodology selectedYear={selectedYear} yearOptions={yearOptions} onYearChange={(v) => vt(() => setSelectedYear(v))} shouldReduceMotion={shouldReduceMotion} facts={facts} />;
       default:
-        return <Representation selectedYear={selectedYear} yearOptions={yearOptions} onYearChange={(v) => vt(() => setSelectedYear(v))} lastUpdatedLabel={lastUpdated} displayMetrics={displayMetrics} highlights={highlights} onOpenDetail={(id) => vt(() => setOpenId(id))} shouldReduceMotion={shouldReduceMotion} facts={facts} />;
+        return <Representation selectedYear={selectedYear} yearOptions={yearOptions} onYearChange={(v) => vt(() => setSelectedYear(v))} lastUpdatedLabel={lastUpdated} displayMetrics={displayMetrics} highlights={{}} onOpenDetail={(id) => vt(() => setOpenId(id))} shouldReduceMotion={shouldReduceMotion} facts={facts} />;
     }
   })();
 
   return (
     <div className="min-h-screen bg-[rgb(var(--color-bg))] text-[rgb(var(--color-text))] transition-colors">
       <a className="skip-link" href="#main-content">Skip to main content</a>
-      <VisuallyHidden aria-live="polite" role="status" aria-atomic="true">{liveAnnouncement}</VisuallyHidden>
 
       <header className="border-b border-soft bg-[rgba(var(--color-surface-muted),0.75)] backdrop-blur">
         <Container className="flex flex-col gap-6 py-8">
@@ -116,7 +168,7 @@ export default function App() {
 
       {activeMetric && facts ? (
         <MetricDetail metric={activeMetric.raw} formattedValue={activeMetric.value} formattedDelta={activeMetric.delta}
-          generatedAt={facts.generatedAt} trend={facts.trend} dimensions={facts.dimensions} onClose={() => vt(() => setOpenId(null))} />
+          generatedAt={facts.generatedAt} trend={getMetricTrend(activeMetric.id)} dimensions={facts.dimensions} onClose={() => vt(() => setOpenId(null))} />
       ) : null}
     </div>
   );

@@ -12,7 +12,16 @@ import type { Factset, Metric } from '../types';
 const TrendLine = lazy(() => import('../components/charts/TrendLine'));
 const BarBreakdown = lazy(() => import('../components/charts/BarBreakdown'));
 
-type DisplayMetric = { id: string; label: string; value: string; delta: string; raw: Metric };
+type DisplayMetric = {
+  id: string;
+  label: string;
+  value: string;
+  rawValue: number;
+  delta: string;
+  sparkline: number[];
+  format: 'percent' | 'score';
+  raw: Metric;
+};
 type Option = { label: string; value: string };
 
 type RepresentationProps = {
@@ -46,9 +55,11 @@ export function Representation({
 
   const grid = displayMetrics ? (
     <div ref={gridRef} className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {displayMetrics.map((m) => (
-        <MetricCard key={m.id} id={m.id} label={m.label} value={m.value} delta={m.delta}
-          onOpen={onOpenDetail} highlighted={Boolean(highlights[m.id])} reduceMotion={shouldReduceMotion} />
+      {displayMetrics.map((m, i) => (
+        <MetricCard key={m.id} id={m.id} label={m.label} value={m.value} rawValue={m.rawValue}
+          delta={m.delta} sparkline={m.sparkline} format={m.format}
+          onOpen={onOpenDetail} highlighted={Boolean(highlights[m.id])}
+          reduceMotion={shouldReduceMotion} index={i} />
       ))}
     </div>
   ) : (
